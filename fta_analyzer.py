@@ -1,9 +1,7 @@
 def analyze_market_potential(export_value_usd_m: float, tariff_advantage: float, logistics_score: float):
     """
-    Calculates a Potential Market Index based on ITC (International Trade Centre) 
-    methodologies: Trade Volume, Tariff Margin, and Trade Friction.
+    Calculates Market Potential Index based on ITC (International Trade Centre) methodologies.
     """
-    # Heuristic scoring formula out of 100
     score = (min(export_value_usd_m / 500.0, 1.0) * 40) + (min(tariff_advantage / 15.0, 1.0) * 40) + (logistics_score * 20)
     
     if score >= 75:
@@ -17,8 +15,7 @@ def analyze_market_potential(export_value_usd_m: float, tariff_advantage: float,
 
 def check_create_more_eligibility(is_ree: bool, export_ratio: float, directly_attributable: bool):
     """
-    Evaluates eligibility under the CREATE MORE Act (RA 12066) for 
-    Ecozone / Registered Business Enterprises (RBEs).
+    Evaluates compliance incentives under the CREATE MORE Act (RA 12066).
     """
     messages = []
     qualified = True
@@ -28,7 +25,7 @@ def check_create_more_eligibility(is_ree: bool, export_ratio: float, directly_at
         messages.append("✅ **VAT-Free Importation:** Capital equipment and raw materials are exempt from import VAT if directly attributable.")
     else:
         qualified = False
-        messages.append("❌ **VAT Relief Warning:** Export ratio is below 70%. Standard VAT rules apply.")
+        messages.append("❌ **VAT Relief Warning:** Export ratio is below 70%. Standard tax rules apply.")
         
     if directly_attributable:
         messages.append("✅ **Enhanced Deductions Regime (EDR):** Eligible for 20% CIT rate option and specialized deductions (power, training, R&D).")
