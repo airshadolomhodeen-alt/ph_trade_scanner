@@ -4,8 +4,7 @@ import streamlit as st
 
 def get_trade_metrics(flow_type: str):
     """
-    Fetches trade statistics. Uses UN Comtrade API if key is available, 
-    otherwise falls back to structured Philippine baseline benchmarks.
+    Fetches international trade destination metrics.
     """
     flow_code = "M" if flow_type == "Imports" else "X"
     api_key = st.secrets.get("UN_COMTRADE_KEY", "DEMO_KEY")
