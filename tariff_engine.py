@@ -4,22 +4,20 @@ import streamlit as st
 @st.cache_data
 def load_ahtn_data():
     """
-    Loads the full global HS/AHTN product nomenclature dataset from the CSV.
+    Safely loads the WITS/HS master nomenclature CSV using latin1 encoding.
     """
     try:
-        df = pd.read_csv("ahtn_2022_master.csv")
+        df = pd.read_csv("ahtn_2022_master.csv", encoding='latin1', on_bad_lines='skip')
+        # Clean up column names
+        df.columns = [str(c).strip() for c in df.columns]
         return df
-    except Exception:
-        # Fallback safeguard table if file lookup encounters issues
-        return pd.DataFrame([
-            {"code": "8542.31", "description": "Electronic integrated circuits: Processors and controllers", "mfn": 3.0, "atiga": 0.0, "rcep": 0.0, "pkfta": 0.0, "pjepa": 0.0},
-            {"code": "0803.90", "description": "Bananas, including plantains, fresh or dried", "mfn": 7.0, "atiga": 0.0, "rcep": 5.0, "pkfta": 3.0, "pjepa": 0.0},
-            {"code": "1513.11", "description": "Coconut (copra) oil and its fractions: Crude oil", "mfn": 10.0, "atiga": 0.0, "rcep": 5.0, "pkfta": 5.0, "pjepa": 0.0}
-        ])
+    except Exception as e:
+        # Fallback if any error occurs
+        return pd.DataFrame(columns=["ProductCode", "Product Description", "Tier"])
 
 def search_ahtn_database(query: str):
     """
-    Performs a dynamic search across the entire uploaded AHTN / HS nomenclature database.
+    Searches across all columns of the 8,000+ product WITS master database.
     """
     df = load_ahtn_data()
     query_lower = query.strip().lower()
