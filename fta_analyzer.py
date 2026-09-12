@@ -1,6 +1,6 @@
 def analyze_market_potential(export_value_usd_m: float, tariff_advantage: float, logistics_score: float):
     """
-    Calculates Market Potential Index based on ITC (International Trade Centre) methodologies.
+    Calculates Market Potential Index based on ITC methodology.
     """
     score = (min(export_value_usd_m / 500.0, 1.0) * 40) + (min(tariff_advantage / 15.0, 1.0) * 40) + (logistics_score * 20)
     
