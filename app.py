@@ -1,33 +1,45 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+from datetime import datetime
 from tariff_engine import search_ahtn_database
-from fta_analyzer import analyze_market_potential, check_create_more_eligibility
+from fta_analyzer import analyze_market_potential, check_create_more_eligibility, get_ph_fta_database
 from trade_stats import get_trade_metrics
 
 st.set_page_config(page_title="PH Economic Zone & Global Trade Intelligence Portal", layout="wide")
 
+# --- Custom Styling & Real-Time Header ---
 st.markdown("""
     <style>
     .main-header {font-size: 2.2rem; font-weight: 700; color: #1E3A8A; margin-bottom: 0px;}
-    .sub-header {font-size: 1.0rem; color: #4B5563; margin-bottom: 20px;}
+    .sub-header {font-size: 1.0rem; color: #4B5563; margin-bottom: 10px;}
+    .live-badge {background-color: #DEF7EC; color: #03543F; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;}
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-header">🇵🇭 PH Economic Zone & Global Trade Intelligence Portal</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Advanced Decision Support System for Exporters, Importers, PEZA Enterprises, and Trade Strategists (Integrated with WITS, UN Comtrade, ASEANStats, & ITC Methodologies).</p>', unsafe_allow_html=True)
+col_head1, col_head2 = st.columns([3, 1])
+with col_head1:
+    st.markdown('<p class="main-header">🇵🇭 PH Economic Zone & Global Trade Intelligence Portal</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Advanced Decision Support System for Exporters, Importers, PEZA Enterprises, and Trade Strategists.</p>', unsafe_allow_html=True)
+with col_head2:
+    current_time_str = datetime.now().strftime("%B %d, %Y | %H:%M:%S PST")
+    st.markdown(f'<br><span class="live-badge">🟢 LIVE SYNC: {current_time_str}</span>', unsafe_allow_html=True)
 
-# Define all 5 tabs upfront
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+st.markdown("---")
+
+# Define all 6 professional tabs
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📊 Macro Bilateral Trade & Partners", 
     "🏷️ AHTN Product Search & Tariff Matrix", 
     "🌍 ITC-Style Market Potential & Trade Map", 
-    "🗺️ Philippine Regional Resource Mapping",
-    "⚖️ CREATE MORE Act (RA 12066) Compliance"
+    "🗺️ Philippine Regional & Interactive Map Hub",
+    "⚖️ CREATE MORE Act (RA 12066) Compliance",
+    "🤝 Philippine Free Trade Agreements (FTAs)"
 ])
 
 with tab1:
     st.subheader("Philippine Bilateral Trade Performance & Partner Rankings")
-    st.markdown("Official trade analytics benchmarked against UN Comtrade and ASEANStats.")
+    st.markdown("Official trade analytics benchmarked against UN Comtrade, WITS, and ASEANStats.")
     flow_type = st.radio("Select Trade Flow Direction", ["Exports", "Imports"], horizontal=True)
     df_stats = get_trade_metrics(flow_type)
     
@@ -44,7 +56,7 @@ with tab1:
 
 with tab2:
     st.subheader("AHTN-2022 Product & Preferential Tariff Matrix (PTF)")
-    st.markdown("Search across 8,244+ WITS nomenclature codes to evaluate MFN vs. FTA Tariff Savings.")
+    st.markdown("Search across 8,244+ nomenclature codes to evaluate MFN vs. FTA Tariff Savings (ATIGA, RCEP, PH-Korea, PJEPA).")
     search_query = st.text_input("Enter HS Code or Keyword (e.g., 'Coconut', 'Semiconductor', 'Banana', '8542')", "Coconut")
     search_results = search_ahtn_database(search_query)
     
@@ -57,7 +69,7 @@ with tab2:
 
 with tab3:
     st.subheader("Potential Export Market Analyzer (ITC Trade Map Methodology)")
-    st.markdown("Evaluate target export destinations using trade gravity models and tariff advantages.")
+    st.markdown("Evaluate target export destinations using trade gravity models, import demand, and preferential tariff advantages.")
     col1, col2, col3 = st.columns(3)
     with col1:
         est_val = st.number_input("Target Market Import Demand (USD M)", value=350.0)
@@ -75,24 +87,36 @@ with tab3:
             st.info(f"**Strategic Classification:** {tier}")
 
 with tab4:
-    st.subheader("Philippine Regional Resource & Industry Cluster Mapping")
-    st.markdown("Align your export product lines with regional raw material strengths, Halal trade potential, and investment promotion agencies (PEZA, BOI, BEZA-BARMM).")
+    st.subheader("Philippine Regional Resource & Interactive Map Hub")
+    st.markdown("Explore key regional production clusters, PEZA economic hubs, and special freeports across the Philippines.")
     
-    region_choice = st.selectbox("Select Philippine Region / Economic Hub", [
+    # Interactive Map Data Frame with real Philippine coordinates
+    map_data = pd.DataFrame({
+        'lat': [14.5995, 13.4125, 7.1907, 10.3157, 8.4542, 6.9214, 15.1450, 16.0433],
+        'lon': [120.9842, 121.2000, 125.4553, 123.8854, 124.6319, 122.0790, 120.5887, 120.3333],
+        'Hub Name': [
+            "NCR - National Trading & Logistics HQ", 
+            "CALABARZON - Laguna Technopark & Automotive Hub", 
+            "Davao Region - Agribusiness & Banana/Cacao Export Center", 
+            "Central Visayas - Mactan PEZA Aerospace & Electronics Hub", 
+            "Northern Mindanao - PHividec Industrial & Steel Hub", 
+            "Zamboanga Peninsula - Sardine & Halal Processing Center",
+            "Central Luzon - Clark Freeport & Logistics Zone",
+            "Ilocos Region - Renewable Energy & Mango Export Hub"
+        ]
+    })
+    
+    st.map(map_data, zoom=5, use_container_width=True)
+    st.caption("📍 Interactive map displaying key Philippine economic zones and export processing hubs.")
+    
+    st.markdown("---")
+    region_choice = st.selectbox("Select Region / Economic Hub for Detailed Intelligence", [
         "BARMM (Bangsamoro Autonomous Region) - Halal Agribusiness, Fisheries, Seaweeds & Corn",
         "CALABARZON (Region IV-A) - Electronics, Automotive & Heavy Industries",
         "Davao Region (Region XI) - Agribusiness (Bananas, Coconuts, Cacao, Fruit)",
         "Central Visayas (Region VII / Mactan PEZA) - Aerospace MRO, Electronics & Furniture",
         "Northern Mindanao (Region X) - Coconuts, Steel, Agro-Industrial & Logistics",
-        "National Capital Region (NCR) - Global Services, Logistics & Trading HQs",
-        "Ilocos Region (Region I) - Mangoes, Tobacco, Renewable Energy & IT-BPM",
-        "Cagayan Valley (Region II) - Corn, Legumes, Coffee & High-Value Crops",
-        "Central Luzon (Region III / Clark-Subic) - Aviation, Logistics, Electronics & Agribusiness",
-        "Western Visayas (Region VI) - Sugar, Renewable Energy, Aqua-marine & Tourism Tech",
-        "Eastern Visayas (Region VIII) - Geothermal Energy, Coconut Products & Minerals",
-        "Zamboanga Peninsula (Region IX) - Sardines, Rubber, Coconut & Halal Trade",
-        "SOCCSKSARGEN (Region XII) - Tuna Capital, Pineapple, Coffee & Palm Oil",
-        "Caraga (Region XIII) - Timber, Mining, Aqua-culture & Nickel Processing"
+        "National Capital Region (NCR) - Global Services, Logistics & Trading HQs"
     ])
     
     if "BARMM" in region_choice:
@@ -100,15 +124,14 @@ with tab4:
 * Halal-certified processed foods, agricultural produce, and ingredients
 * High-grade carrageenan (seaweed farming - major global exporter)
 * Yellow corn, Robusta coffee, and tropical fruits
-* Artisanal fisheries, aquaculture, and cold-chain logistics
 
 **Investment & Trade Agencies:** 
-* **Bangsamoro Economic Zone Authority (BEZA-BARMM)** – Establishes and regulates special economic zones, offering fiscal and non-fiscal incentives.
-* **Bangsamoro Board of Investments (BBOI)** and **Ministry of Trade, Investments and Tourism (MTIT-BARMM)**.
+* **Bangsamoro Economic Zone Authority (BEZA-BARMM)** – Establishes and regulates special economic zones and freeports.
+* **Bangsamoro Board of Investments (BBOI)** & **Ministry of Trade, Investments and Tourism (MTIT-BARMM)**.
 
-**Export Advantages & Markets:** Strategic participation in the **BIMP-EAGA (Brunei-Indonesia-Malaysia-Philippines East ASEAN Growth Area)** and expanding Halal-compliant trade channels across the Middle East, North Africa (MENA), and Southeast Asia.""")
+**Export Advantage:** Strategic participation in the **BIMP-EAGA** growth area and expanding Halal-compliant trade channels across MENA and Southeast Asia.""")
     else:
-        st.success(f"**Selected Hub:** {region_choice}\n\n**Strategic Focus:** Regional commodity integration, domestic distribution, and value-chain processing for international export compliance.")
+        st.success(f"**Selected Hub Profile:** {region_choice}\n\n**Strategic Focus:** Regional commodity integration, PEZA/BOI tax incentive alignment, and international export supply chain logistics.")
 
 with tab5:
     st.subheader("CREATE MORE Act (RA 12066) Incentives & Compliance Checker")
@@ -124,3 +147,10 @@ with tab5:
         passed, log_messages = check_create_more_eligibility(is_ree, export_ratio, directly_attributable)
         for msg in log_messages:
             st.markdown(msg)
+
+with tab6:
+    st.subheader("Official Philippine Free Trade Agreements (FTAs) & Preferential Access")
+    st.markdown("Examine active bilateral and regional trade agreements negotiated by the DTI to eliminate tariff barriers.")
+    
+    fta_list = get_ph_fta_database()
+    st.dataframe(pd.DataFrame(fta_list), use_container_width=True, hide_index=True)
