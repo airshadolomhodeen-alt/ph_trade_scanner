@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 from tariff_engine import search_ahtn_database
 from fta_analyzer import analyze_market_potential, check_create_more_eligibility, get_ph_fta_database
-from trade_stats import get_trade_metrics, get_economic_zones_directory
+from trade_stats import get_trade_metrics, get_economic_zones_directory, get_trade_news_feed
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -42,23 +42,31 @@ st.markdown("""
         box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
     h3 {color: #1E3A8A !important; font-weight: 700 !important;}
-    .footer-box {
-        background-color: #F1F5F9;
-        border: 1px solid #CBD5E1;
-        padding: 18px;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        color: #334155;
-        margin-top: 40px;
-        line-height: 1.6;
+    .news-card {
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-left: 4px solid #1E3A8A;
+        padding: 16px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
-    .footer-box a {
-        color: #1D4ED8;
-        text-decoration: none;
+    .news-headline {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0F172A;
+        margin-bottom: 6px;
+    }
+    .news-meta {
+        font-size: 0.8rem;
+        color: #64748B;
         font-weight: 600;
+        margin-bottom: 8px;
     }
-    .footer-box a:hover {
-        text-decoration: underline;
+    .news-summary {
+        font-size: 0.9rem;
+        color: #334155;
+        line-height: 1.5;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -75,13 +83,15 @@ with col_head2:
 st.markdown("---")
 
 # --- Professional Tab Arrangement ---
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "📊 Macro Trade & Partner Rankings", 
     "🏷️ AHTN Tariff & Product Matrix", 
     "🌍 ITC Market Potential Analyzer", 
     "🌐 International Trade Strategy",
     "🤝 Free Trade Agreements (FTAs)",
-    "⚖️ CREATE MORE Act Compliance"
+    "⚖️ CREATE MORE Act Compliance",
+    "📰 Trade News & Policy Ticker",
+    "🏛️ BOC, CMTA & FTA Origin"
 ])
 
 with tab1:
@@ -243,20 +253,87 @@ with tab6:
         for msg in log_messages:
             st.markdown(msg)
 
-# --- Official Institutional Portals & References Footer ---
-zones_dir = get_economic_zones_directory()
-footer_html = """
-    <div class="footer-box">
-        <strong>🌐 Official Institutional Data Repositories & Economic Zones:</strong><br>
-"""
-for zone in zones_dir:
-    footer_html += f"* 🔗 <strong>{zone['Zone Authority']}:</strong> <a href='{zone['Official Portal']}' target='_blank'>{zone['Official Portal']}</a> — {zone['Core Mandate']}<br>\n"
+with tab7:
+    st.subheader("📰 International Trade, Import/Export & Economic Zone News Ticker")
+    st.markdown("Curated updates tracking Philippine merchandise trade performance, DTI export initiatives, PEZA investment targets, and customs regulations.")
+    
+    news_feed = get_trade_news_feed()
+    for item in news_feed:
+        st.markdown(f"""
+            <div class="news-card">
+                <div class="news-headline">{item['Headline']}</div>
+                <div class="news-meta">📂 Category: {item['Category']} &nbsp;|&nbsp; 📅 {item['Date']} &nbsp;|&nbsp; 🏛️ Source: {item['Source']}</div>
+                <div class="news-summary">{item['Summary']}</div>
+            </div>
+        """, unsafe_allow_html=True)
 
-footer_html += """
-        <br><strong>Application Architecture & Development:</strong><br>
-        Developed and architected by <strong>Engr. Airsad R. Olomodin, MBA, CBE, PhD</strong>.<br><br>
-        <strong>References & Institutional Disclaimer:</strong><br>
-        This portal synthesizes official trade datasets benchmarked against <em>UN Comtrade, World Bank World Integrated Trade Solution (WITS), International Trade Centre (ITC) Trade Map, ASEANStats (data.aseanstats.org), PEZA (peza.gov.ph), Subic Bay Freeport (mysubicbay.com.ph), and labor standards (afablabor.com)</em>. Structured for institutional decision support, strategic trade planning, and academic research purposes.
-    </div>
-"""
-st.markdown(footer_html, unsafe_allow_html=True)
+with tab8:
+    st.subheader("🏛️ Bureau of Customs (BOC), CMTA (RA 10863) & FTA Origin Management")
+    st.markdown("Official guidelines for customs clearance, duty valuation schedules, electronic payments, and Rules of Origin (ROO) compliance under BOC & Tariff Commission frameworks.")
+    
+    boc_tab_choice = st.selectbox("Select Customs & Tariff Regulatory Domain", [
+        "1. Customs Modernization and Tariff Act (CMTA / RA 10863) & Duty Valuation",
+        "2. Rules of Origin (ROO) & Preferential Tariff Qualification",
+        "3. FTA Origin Management System (OMS) & Product Evaluation Reports (PER)",
+        "4. Duties, Taxes & Electronic Payment Schedules (E2M / VASP)"
+    ])
+    
+    if "1." in boc_tab_choice:
+        st.markdown("### Customs Modernization and Tariff Act (CMTA / RA 10863)")
+        st.markdown("""
+        The **CMTA (RA 10863)** governs all import and export clearances, tariff classifications, and valuation principles in the Philippines:
+        * **Transaction Value Base:** Customs valuation is primarily based on the transaction value (actual price paid or payable).
+        * **Tariff Schedules:** The Philippines maintains **14 tariff schedules** housed by the Tariff Commission—1 Most Favoured Nation (MFN) schedule and 13 Free Trade Agreement (FTA) schedules.
+        * **Advance Rulings:** Importers can apply for official tariff classification advance rulings under Section 1100 of the CMTA to ensure certainty before shipment arrival.
+        """)
+        cmta_summary = pd.DataFrame({
+            "Core CMTA Principle": ["Tariff Classification", "Customs Clearance & Lodgment", "Post Clearance Audit (PCA)", "Surcharges & Penalties"],
+            "Operational Framework": ["Based on AHTN-2022 nomenclature standard", "Electronic lodging via BOC E2M / Value Added Service Providers (VASP)", "Conducted within 3 years from date of final payment of duties", "Imposed on misdeclaration, undervaluation, or misclassification under Section 1400"]
+        })
+        st.dataframe(cmta_summary, use_container_width=True, hide_index=True)
+
+    elif "2." in boc_tab_choice:
+        st.markdown("### Rules of Origin (ROO) & Preferential Tariff Qualification")
+        st.markdown("""
+        Rules of Origin (ROO) determine the economic nationality of a product to establish whether it qualifies for lower or zero preferential tariff rates under regional FTAs (ATIGA, ACFTA, RCEP, etc.):
+        * **Wholly Obtained:** Goods grown, harvested, or completely manufactured within a single member state.
+        * **Substantial Transformation:** Goods processed using non-originating materials that result in a change in tariff heading (CTH) or meet a specific Regional Value Content (RVC) percentage threshold (e.g., usually 40%).
+        * **Cumulation Principles:** Allows inputs from partner countries in agreements like RCEP or ATIGA to count toward regional value requirements.
+        """)
+
+    elif "3." in boc_tab_choice:
+        st.markdown("### FTA Origin Management System (OMS) & Product Evaluation Reports (PER)")
+        st.markdown("""
+        In accordance with recent BOC and DTI guidelines, the **FTA Origin Management System (OMS)** and **Product Evaluation Report (PER) Management System** automate export origin claims:
+        * **PER Application:** Exporters submit product evaluation reports online through the OMS to prove qualification before securing a Certificate of Origin (CO) or making out an Origin Declaration.
+        * **Approved Exporter Scheme:** Certified Exporters are granted authorization by the BOC to issue self-certified Origin Declarations directly on commercial invoices.
+        """)
+
+    else:
+        st.markdown("### Duties, Taxes & Electronic Payment Schedules (E2M / VASP)")
+        st.markdown("""
+        Importers must settle duties and taxes before cargo release through authorized agent banks (AABs) linked to the BOC **Electronic-to-Mobile (E2M)** system:
+        * **Customs Duty:** Calculated based on CIF (Cost, Insurance, and Freight) value multiplied by the applicable MFN or FTA preferential rate.
+        * **Value-Added Tax (VAT):** 12% levied on the sum of (CIF value + Customs Duty + Excise Tax + Other BOC fees).
+        * **Payment Channels:** Secure electronic funds transfer (EFT) via accredited commercial banks or VASP gateways. PEZA-registered enterprises enjoy VAT zero-rating and duty-free privileges on capital equipment and raw materials directly tied to export production under the CREATE MORE Act.
+        """)
+
+# --- Clean, Professional Institutional Footer ---
+st.markdown("---")
+st.markdown("### 🌐 Official Institutional Data Repositories & Economic Zones")
+
+zones_dir = get_economic_zones_directory()
+for zone in zones_dir:
+    st.markdown(f"- **[{zone['Zone Authority']}]({zone['Official Portal']})**: {zone['Core Mandate']} *({zone['Key Advantages']})*")
+
+st.markdown("---")
+st.markdown(
+    """
+    **Application Architecture & Development:**  
+    Developed and architected by **Engr. Airsad R. Olomodin, MBA, CBE, PhD**.
+    
+    **References & Institutional Disclaimer:**  
+    This portal synthesizes official trade datasets benchmarked against *Bureau of Customs (BOC), CMTA (RA 10863), Tariff Commission Philippine Tariff Finder, UN Comtrade, World Bank WITS, ITC Trade Map, ASEANStats (data.aseanstats.org), PEZA (peza.gov.ph), Subic Bay Freeport (mysubicbay.com.ph), and labor standards (afablabor.com)*. Structured for institutional decision support, strategic trade planning, and academic research purposes.
+    """,
+    help="PhilTrade-GIS Official Governance & Metadata Notice"
+)
