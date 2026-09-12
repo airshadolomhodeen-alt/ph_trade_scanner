@@ -1,84 +1,80 @@
-def analyze_market_potential(est_val, tariff_adv, logistics_val):
-    """Calculates Market Potential Index score based on ITC Trade Map methodology."""
-    score = int(min(100, max(0, (est_val / 10.0) + (tariff_adv * 3.0) + (logistics_val * 30.0))))
-    if score >= 75:
-        tier = "Tier 1: High Priority Export Market (Strong demand & robust preference margins)"
-    elif score >= 50:
-        tier = "Tier 2: Moderate Opportunity Market (Viable with targeted compliance strategy)"
-    else:
-        tier = "Tier 3: Niche or High-Barrier Market (Requires strategic cost optimization)"
-    return score, tier
-
-def check_create_more_eligibility(is_ree, export_ratio, directly_attributable):
-    """Verifies compliance against CREATE MORE Act (RA 12066) provisions."""
-    logs = []
-    passed_all = True
-    
-    if is_ree:
-        logs.append("✅ **Registered Export Enterprise Status:** Verified under CREATE MORE Act (RA 12066).")
-    else:
-        logs.append("❌ **Registered Export Enterprise Status:** Must be a certified REE to qualify for export tax privileges.")
-        passed_all = False
-        
-    if export_ratio >= 70.0:
-        logs.append(f"✅ **VAT Zero-Rating on Local Purchases:** Fully qualified under RA 12066 (meets the >= 70% export threshold at {export_ratio}%).")
-        logs.append("✅ **VAT-Free Importation:** Capital equipment, raw materials, and spare parts are 100% exempt from import VAT.")
-        logs.append("✅ **Enhanced Deductions Regime (EDR):** Eligible for 20% corporate income tax (CIT) rate option and additional deductions (power expense, training, R&D).")
-    else:
-        logs.append(f"⚠️ **Export Threshold Warning:** Current export ratio is {export_ratio}%. RA 12066 requires at least 70% export allocation for full export tax incentives.")
-        passed_all = False
-        
-    if directly_attributable:
-        logs.append("✅ **Direct Attributability:** Inputs are directly tied to registered export activity, ensuring full audit compliance.")
-    else:
-        logs.append("⚠️ **Direct Attributability Warning:** Inputs must be directly attributable to export activity to claim domestic VAT zero-rating.")
-        passed_all = False
-        
-    return passed_all, logs
-
 def get_ph_fta_database():
-    """Returns official Free Trade Agreements of the Philippines with active coverage."""
     return [
-        {
-            "FTA Code": "RCEP",
-            "Agreement Name": "Regional Comprehensive Economic Partnership",
-            "Partners": "ASEAN (10 member states) + China, Japan, South Korea, Australia, New Zealand",
-            "Effective Date": "June 2023",
-            "Key Benefits": "Unified rules of origin, expanded market access for electronics, agriculture, and services across 15 major economies."
-        },
         {
             "FTA Code": "ATIGA",
             "Agreement Name": "ASEAN Trade in Goods Agreement",
-            "Partners": "Brunei, Cambodia, Indonesia, Laos, Malaysia, Myanmar, Philippines, Singapore, Thailand, Vietnam",
-            "Effective Date": "January 2010",
-            "Key Benefits": "0% to 5% preferential tariff rates on intra-ASEAN trade for qualified regional goods."
+            "Partner Markets": "Brunei, Cambodia, Indonesia, Laos, Malaysia, Myanmar, Singapore, Thailand, Vietnam",
+            "Key Products": "Electronics, Automotive Parts, Agricultural Goods, Processed Foods",
+            "Tariff Advantage": "0% Preferential Duty on 99%+ tariff lines",
+            "Strategic Value": "Backbone of regional supply chains and intra-ASEAN sourcing."
+        },
+        {
+            "FTA Code": "ACFTA",
+            "Agreement Name": "ASEAN-China Free Trade Area",
+            "Partner Markets": "Mainland China & ASEAN Member States",
+            "Key Products": "Machinery, Raw Chemical Inputs, Fruits (Bananas, Pineapples), Minerals",
+            "Tariff Advantage": "Elimination of tariffs on over 90% of traded goods",
+            "Strategic Value": "Primary gateway for intermediate electronics and agricultural export volume."
         },
         {
             "FTA Code": "PJEPA",
             "Agreement Name": "Philippines-Japan Economic Partnership Agreement",
-            "Partners": "Japan",
-            "Effective Date": "December 2008",
-            "Key Benefits": "Bilateral FTA eliminating tariffs on major industrial goods, auto parts, machinery, and key agricultural products (bananas, seafood)."
+            "Partner Markets": "Japan",
+            "Key Products": "Ignition Wiring Sets, Electronic Microassemblies, Fresh Bananas, Tuna",
+            "Tariff Advantage": "Duty-free entry for key Philippine agricultural and manufacturing lines",
+            "Strategic Value": "Bilateral depth for high-value manufacturing and automotive components."
         },
         {
-            "FTA Code": "PKFTA",
-            "Agreement Name": "Philippines-Korea Free Trade Agreement",
-            "Partners": "South Korea",
-            "Effective Date": "December 2024",
-            "Key Benefits": "Enhanced market access for Philippine bananas, tropical fruits, and garments in exchange for duty-free or reduced tariffs on Korean autos and components."
+            "FTA Code": "RCEP",
+            "Agreement Name": "Regional Comprehensive Economic Partnership",
+            "Partner Markets": "ASEAN + China, Japan, South Korea, Australia, New Zealand",
+            "Key Products": "All major industrial sectors, processed agricultural products, services",
+            "Tariff Advantage": "Unified Rules of Origin (ROO) and progressive tariff phase-outs",
+            "Strategic Value": "Expanded cumulation rules simplifying regional value chain integration."
         },
         {
-            "FTA Code": "PH-EFTA",
-            "Agreement Name": "Philippines-European Free Trade Association FTA",
-            "Partners": "Iceland, Liechtenstein, Norway, Switzerland",
-            "Effective Date": "June 2018",
-            "Key Benefits": "Elimination of tariffs on industrial and fisheries exports to high-income European markets outside the EU."
-        },
-        {
-            "FTA Code": "AANZFTA",
-            "Agreement Name": "ASEAN-Australia-New Zealand Free Trade Agreement",
-            "Partners": "ASEAN + Australia, New Zealand",
-            "Effective Date": "January 2010",
-            "Key Benefits": "Comprehensive tariff elimination and regional supply chain integration across Oceania and Southeast Asia."
+            "FTA Code": "AKFTA",
+            "Agreement Name": "ASEAN-Korea Free Trade Area",
+            "Partner Markets": "South Korea & ASEAN",
+            "Key Products": "Coconut Oil, Copper Products, Garments, Electronic Parts",
+            "Tariff Advantage": "90%+ tariff elimination with sensitive list exceptions",
+            "Strategic Value": "Major market access for Philippine oleochemicals and processed food."
         }
     ]
+
+def analyze_market_potential(demand, tariff_adv, logistics):
+    score = round((demand * 0.4) + (tariff_adv * 3.5) + (logistics * 25), 1)
+    if score >= 75:
+        tier = "Tier 1: Prime Target Market (High Demand & High Margin)"
+    elif score >= 50:
+        tier = "Tier 2: Viable Secondary Market (Moderate Potential)"
+    else:
+        tier = "Tier 3: Niche or High-Barrier Market"
+    return score, tier
+
+def check_create_more_eligibility(is_ree, export_ratio, directly_attributable):
+    logs = []
+    passed = True
+    if not is_ree:
+        passed = False
+        logs.append("❌ **Disqualification Notice:** Enterprise must be a Registered Export Enterprise (REE) under PEZA or Investment Promotion Agencies (IPAs) to qualify for CREATE MORE Act (RA 12066) incentives.")
+    else:
+        logs.append("✅ **REE Status Verified:** Enterprise is recognized as a Registered Export Enterprise.")
+    
+    if export_ratio >= 70.0:
+        logs.append(f"✅ **Export Threshold Met:** Export sales ratio is {export_ratio}% (Exceeds the 70% mandatory threshold for REEs).")
+    else:
+        passed = False
+        logs.append(f"❌ **Export Threshold Failed:** Export sales ratio is {export_ratio}%. Must be at least 70% to qualify for full fiscal incentives.")
+        
+    if directly_attributable:
+        logs.append("✅ **VAT Zero-Rating & Duty-Free Compliance:** Local purchases and imported capital equipment/raw materials are directly attributable to registered export activity under RA 12066.")
+    else:
+        passed = False
+        logs.append("❌ **Compliance Error:** Inputs must be directly attributable to export production to enjoy duty-free privileges.")
+        
+    if passed:
+        logs.append("### 🏆 Final Assessment: ELIGIBLE FOR CREATE MORE ACT (RA 12066) INCENTIVES\n* Entitled to **4% to 5% Special Corporate Income Tax (SCIT)** or up to **10-year Corporate Income Tax Holiday (ITH)** plus enhanced deductions.")
+    else:
+        logs.append("### ⚠️ Final Assessment: ACTION REQUIRED\n* Review operational thresholds before filing with PEZA or BOI.")
+    return passed, logs
