@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 from datetime import datetime
 from tariff_engine import search_ahtn_database
 from fta_analyzer import analyze_market_potential, check_create_more_eligibility, get_ph_fta_database
-from trade_stats import get_trade_metrics
+from trade_stats import get_trade_metrics, get_economic_zones_directory
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -46,11 +45,20 @@ st.markdown("""
     .footer-box {
         background-color: #F1F5F9;
         border: 1px solid #CBD5E1;
-        padding: 15px;
+        padding: 18px;
         border-radius: 8px;
         font-size: 0.85rem;
         color: #334155;
         margin-top: 40px;
+        line-height: 1.6;
+    }
+    .footer-box a {
+        color: #1D4ED8;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .footer-box a:hover {
+        text-decoration: underline;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -78,7 +86,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 
 with tab1:
     st.subheader("Philippine Bilateral Trade Performance & Partner Rankings")
-    st.markdown("Official macroeconomic trade analytics benchmarked against **UN Comtrade, World Bank WITS, and ASEANStats**.")
+    st.markdown("Official macroeconomic trade analytics benchmarked against **UN Comtrade, World Bank WITS, and ASEANStats (data.aseanstats.org)**.")
     
     flow_type = st.radio("Select Trade Flow Direction", ["Exports", "Imports"], horizontal=True)
     df_stats = get_trade_metrics(flow_type)
@@ -96,7 +104,7 @@ with tab1:
 
 with tab2:
     st.subheader("AHTN-2022 Product Nomenclature & Preferential Tariff Matrix")
-    st.markdown("Search across 8,244+ Harmonized System / ASEAN Harmonized Tariff Nomenclature codes to evaluate MFN vs. Preferential FTA rates.")
+    st.markdown("Search across Harmonized System / ASEAN Harmonized Tariff Nomenclature codes to evaluate MFN vs. Preferential FTA rates.")
     
     search_query = st.text_input("Enter HS Code or Keyword (e.g., 'Coconut', 'Semiconductor', 'Banana', '8542')", "Coconut")
     search_results = search_ahtn_database(search_query)
@@ -130,7 +138,7 @@ with tab3:
 
 with tab4:
     st.subheader("🌐 International Trade Strategy & Statistical Analytics Hub")
-    st.markdown("Advanced policy analytics synthesized from **UN Comtrade, WITS, ITC Trade Map, and ASEANStats** to guide national export diversification and trade negotiations.")
+    st.markdown("Advanced policy analytics synthesized from **UN Comtrade, World Bank WITS, ITC Trade Map, and ASEANStats**.")
     
     strategy_tab_choice = st.selectbox("Select Trade Strategy Dimension", [
         "1. Export Diversification & Revealed Comparative Advantage (RCA)",
@@ -141,8 +149,6 @@ with tab4:
     
     if "1." in strategy_tab_choice:
         st.markdown("### Export Diversification & Revealed Comparative Advantage (RCA)")
-        st.markdown("Statistical measurement of Philippine export specialization relative to global trade benchmarks.")
-        
         rca_data = pd.DataFrame({
             "Sector / Product Group": [
                 "Electronic Integrated Circuits & Microassemblies (HS 8542)",
@@ -174,12 +180,10 @@ with tab4:
             ]
         })
         st.dataframe(rca_data, use_container_width=True, hide_index=True)
-        st.info("💡 **Strategy Insight:** An RCA index above 1.0 indicates a revealed comparative advantage. High RCA scores in coconut oil (12.10) and bananas (6.45) confirm the Philippines is a dominant global supplier, while electronics (3.85) anchors high-tech manufacturing exports.")
+        st.info("💡 **Strategy Insight:** An RCA index above 1.0 indicates revealed comparative advantage. High RCA scores in coconut oil (12.10) and bananas (6.45) confirm the Philippines is a dominant global supplier.")
 
     elif "2." in strategy_tab_choice:
         st.markdown("### Non-Tariff Measures (NTMs) & Sanitary/Phytosanitary (SPS) Compliance")
-        st.markdown("Analysis of regulatory burdens, technical barriers to trade (TBT), and market entry prerequisites based on ITC NTM surveys.")
-        
         ntm_data = pd.DataFrame({
             "Target Export Market": ["European Union (EU)", "United States (US FDA)", "China (GACC)", "Japan (MAFF)", "ASEAN Member States"],
             "Primary NTM Constraint": ["Strict Maximum Residue Limits (MRLs) & Traceability", "FSMA Verification, HACCP & Facility Registration", "GACC Decree 248/249 Registration & Quarantine", "Positive List System for Agricultural Chemicals", "ATIGA Certificate of Origin (Form D) Verification"],
@@ -190,25 +194,22 @@ with tab4:
 
     elif "3." in strategy_tab_choice:
         st.markdown("### Global Value Chain (GVC) Integration & Intermediate Goods Strategy")
-        st.markdown("Evaluating backward and forward participation linkages using World Bank WITS and UN Comtrade input-output data.")
         st.success("""**Strategic Blueprint for GVC Upgrading:**
-1. **Backward Integration (Importing Inputs for Export):** Maximize duty-free importation of high-tech components (semiconductor wafers, raw chemical inputs) under the **CREATE MORE Act (RA 12066)** to assemble finished tech goods without capital tax penalty.
-2. **Forward Integration (Supplying Intermediate Goods):** Scale up domestic production of specialized auto-wiring harnesses and electronics sub-assemblies to feed final assembly hubs in Japan, South Korea, and China.
-3. **Digital Supply Chain Transparency:** Implement blockchain and IoT tracking for agricultural exports to meet strict EU and US ESG / supply chain due diligence regulations.""")
+1. **Backward Integration:** Maximize duty-free importation of high-tech components (semiconductor wafers, raw chemicals) under the **CREATE MORE Act (RA 12066)** via PEZA (peza.gov.ph).
+2. **Forward Integration:** Scale up domestic production of specialized auto-wiring harnesses and electronics sub-assemblies.
+3. **Digital Supply Chain Transparency:** Implement blockchain and IoT tracking for agricultural exports to meet strict EU/US ESG due diligence regulations.""")
 
     else:
         st.markdown("### Foreign Direct Investment (FDI) & Special Economic Zone (SEZ) Strategy")
-        st.markdown("Benchmarking PEZA economic zones and freeports against regional investment competitors (Vietnam, Indonesia, Thailand).")
-        
         fdi_data = pd.DataFrame({
             "Strategic Pillar": ["Tax Incentive Structure", "Labor Force Competitiveness", "Infrastructure & Logistics", "Ease of Doing Business"],
-            "Philippine Policy Edge (RA 12066)": ["4% to 5% Special Corporate Income Tax (SCIT) or 10-year Corporate Income Tax Holiday (ITH) + Enhanced Deductions", "High English proficiency, skilled engineering graduates, young demographic median age (25 years)", "Expanding tollway networks, Clark/Subic/Mactan international gateway integration", "Streamlined one-stop shop registration via PEZA and BOI under CREATE MORE Act"]
+            "Philippine Policy Edge (RA 12066)": ["4% to 5% Special Corporate Income Tax (SCIT) or 10-year Corporate Income Tax Holiday (ITH)", "High English proficiency, skilled engineering graduates, young demographic median age (25 years)", "Expanding tollway networks, Clark/Subic/Mactan (mysubicbay.com.ph) gateway integration", "Streamlined one-stop shop registration via PEZA and BOI under CREATE MORE Act"]
         })
         st.dataframe(fdi_data, use_container_width=True, hide_index=True)
 
 with tab5:
     st.subheader("Official Philippine Free Trade Agreements (FTAs) & Preferential Access Matrix")
-    st.markdown("Examine active bilateral and regional trade agreements negotiated by the DTI with specific target markets and tariff margins.")
+    st.markdown("Examine active bilateral and regional trade agreements negotiated by the DTI.")
     
     fta_list = get_ph_fta_database()
     df_fta = pd.DataFrame(fta_list)
@@ -220,21 +221,15 @@ with tab5:
     
     matched_fta = next((f for f in fta_list if f["FTA Code"] == selected_fta_code), None)
     if matched_fta:
-        # Robust dictionary key fallbacks to prevent KeyError
-        markets = matched_fta.get('Partner Markets', matched_fta.get('Target Markets', 'N/A'))
-        products = matched_fta.get('Key Products', matched_fta.get('Top Export Products', 'N/A'))
-        advantage = matched_fta.get('Tariff Advantage', 'N/A')
-        strat_value = matched_fta.get('Strategic Value', 'N/A')
-        
         st.success(f"""**Agreement:** {matched_fta['Agreement Name']}
-* **Partner / Target Markets:** {markets}
-* **High-Priority Product Lines:** {products}
-* **Preferential Tariff Advantage:** {advantage}
-* **Strategic Value:** {strat_value}""")
+* **Partner Markets:** {matched_fta['Partner Markets']}
+* **High-Priority Product Lines:** {matched_fta['Key Products']}
+* **Preferential Tariff Advantage:** {matched_fta['Tariff Advantage']}
+* **Strategic Value:** {matched_fta['Strategic Value']}""")
 
 with tab6:
     st.subheader("CREATE MORE Act (RA 12066) Incentives & Compliance Checker")
-    st.markdown("Designed for Registered Business Enterprises (RBEs) operating inside PEZA Economic Zones and Freeports.")
+    st.markdown("Designed for Registered Business Enterprises (RBEs) operating inside PEZA Economic Zones (peza.gov.ph) and Freeports (mysubicbay.com.ph).")
     
     col_c1, col_c2 = st.columns(2)
     with col_c1:
@@ -248,14 +243,20 @@ with tab6:
         for msg in log_messages:
             st.markdown(msg)
 
-# --- Author Attribution & Institutional Disclaimer Footer ---
-st.markdown("""
+# --- Official Institutional Portals & References Footer ---
+zones_dir = get_economic_zones_directory()
+footer_html = """
     <div class="footer-box">
-        <strong>Application Architecture & Development:</strong><br>
+        <strong>🌐 Official Institutional Data Repositories & Economic Zones:</strong><br>
+"""
+for zone in zones_dir:
+    footer_html += f"* 🔗 <strong>{zone['Zone Authority']}:</strong> <a href='{zone['Official Portal']}' target='_blank'>{zone['Official Portal']}</a> — {zone['Core Mandate']}<br>\n"
+
+footer_html += """
+        <br><strong>Application Architecture & Development:</strong><br>
         Developed and architected by <strong>Engr. Airsad R. Olomodin, MBA, CBE, PhD</strong>.<br><br>
-        <strong>References & Data Sources Disclaimer:</strong><br>
-        This portal synthesizes official trade and economic datasets benchmarked against 
-        <em>UN Comtrade Database, World Bank World Integrated Trade Solution (WITS), International Trade Centre (ITC) Trade Map, ASEANStats, and the Department of Trade and Industry (DTI) Philippines</em>. 
-        The analytics, comparative indexes, and compliance modules provided herein are structured for institutional decision support, strategic trade planning, and academic research purposes.
+        <strong>References & Institutional Disclaimer:</strong><br>
+        This portal synthesizes official trade datasets benchmarked against <em>UN Comtrade, World Bank World Integrated Trade Solution (WITS), International Trade Centre (ITC) Trade Map, ASEANStats (data.aseanstats.org), PEZA (peza.gov.ph), Subic Bay Freeport (mysubicbay.com.ph), and labor standards (afablabor.com)</em>. Structured for institutional decision support, strategic trade planning, and academic research purposes.
     </div>
-""", unsafe_allow_html=True)
+"""
+st.markdown(footer_html, unsafe_allow_html=True)
