@@ -8,7 +8,7 @@ from trade_stats import get_trade_metrics
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="PhilTrade-GIS | Philippine Trade & Economic Zone Intelligence", 
+    page_title="PhilTrade-GIS | PH Trade & Economic Portal", 
     page_icon="🇵🇭", 
     layout="wide"
 )
@@ -130,7 +130,7 @@ with tab3:
 
 with tab4:
     st.subheader("🌐 International Trade Strategy & Statistical Analytics Hub")
-    st.markdown("Advanced policy analytics synthesized from **UN Comtrade, World Bank WITS, ITC Trade Map, and ASEANStats** to guide national export diversification and trade negotiations.")
+    st.markdown("Advanced policy analytics synthesized from **UN Comtrade, WITS, ITC Trade Map, and ASEANStats** to guide national export diversification and trade negotiations.")
     
     strategy_tab_choice = st.selectbox("Select Trade Strategy Dimension", [
         "1. Export Diversification & Revealed Comparative Advantage (RCA)",
@@ -220,11 +220,17 @@ with tab5:
     
     matched_fta = next((f for f in fta_list if f["FTA Code"] == selected_fta_code), None)
     if matched_fta:
+        # Robust dictionary key fallbacks to prevent KeyError
+        markets = matched_fta.get('Partner Markets', matched_fta.get('Target Markets', 'N/A'))
+        products = matched_fta.get('Key Products', matched_fta.get('Top Export Products', 'N/A'))
+        advantage = matched_fta.get('Tariff Advantage', 'N/A')
+        strat_value = matched_fta.get('Strategic Value', 'N/A')
+        
         st.success(f"""**Agreement:** {matched_fta['Agreement Name']}
-* **Target Export Destinations:** {matched_fta['Target Markets']}
-* **High-Priority Product Lines:** {matched_fta['Top Export Products']}
-* **Preferential Tariff Advantage:** {matched_fta['Tariff Advantage']}
-* **Strategic Value:** {matched_fta['Strategic Value']}""")
+* **Partner / Target Markets:** {markets}
+* **High-Priority Product Lines:** {products}
+* **Preferential Tariff Advantage:** {advantage}
+* **Strategic Value:** {strat_value}""")
 
 with tab6:
     st.subheader("CREATE MORE Act (RA 12066) Incentives & Compliance Checker")
