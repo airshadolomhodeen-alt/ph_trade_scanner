@@ -3,6 +3,10 @@ import pandas as pd
 import streamlit as st
 
 def get_trade_metrics(flow_type: str):
+    """
+    Fetches trade statistics. Uses UN Comtrade API if key is available, 
+    otherwise falls back to structured Philippine baseline benchmarks.
+    """
     flow_code = "M" if flow_type == "Imports" else "X"
     api_key = st.secrets.get("UN_COMTRADE_KEY", "DEMO_KEY")
     
@@ -17,7 +21,7 @@ def get_trade_metrics(flow_type: str):
             if df is not None and not df.empty:
                 return df[['partner2Desc', 'primaryValue']].head(15)
         except Exception:
-            pass
+            pass 
             
     if flow_type == "Exports":
         data = {
