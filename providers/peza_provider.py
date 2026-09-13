@@ -1,5 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
+import urllib3
+
+# Suppress insecure request warnings when verify=False is used
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class PezaProvider:
     def __init__(self):
@@ -10,11 +14,12 @@ class PezaProvider:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
         try:
-            response = requests.get(self.url, headers=headers, timeout=10)
+            # Added verify=False to bypass cloud environment SSL certificate validation errors
+            response = requests.get(self.url, headers=headers, timeout=12, verify=False)
+            
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 results = []
-                # Extract links and titles from PEZA portal
                 for a_tag in soup.find_all('a', href=True):
                     text = a_tag.get_text(strip=True)
                     link = a_tag['href']
@@ -23,7 +28,6 @@ class PezaProvider:
                             link = f"https://www.peza.gov.ph{link}"
                         results.append({"title": text, "url": link})
                 
-                # Remove duplicates based on title
                 seen = set()
                 unique_results = []
                 for r in results:
@@ -31,20 +35,8 @@ class PezaProvider:
                         seen.add(r['title'])
                         unique_results.append(r)
                         
-                return {
-                    "status": "VERIFIED",
-                    "source": "PEZA Portal",
-                    "data": unique_results[:15] # Return top relevant downloads
-                }
+                return {"status": "VERIFIED", "source": "PEZA Portal", "data": unique_results[:15]}
             else:
-                return {
-                    "status": "HTTP_ERROR",
-                    "message": f"Server responded with code {response.status_code}",
-                    "data": []
-                }
+                return {"status": "HTTP_ERROR", "message": f"Server status {response.status_code}", "data": []}
         except Exception as e:
-            return {
-                "status": "CONNECTION FAILED",
-                "message": str(e),
-                "data": []
-            }
+            return {"status": "CONNECTION FAILED", "message": str(e), "data": []}
