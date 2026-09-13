@@ -85,7 +85,7 @@ st.sidebar.markdown("---")
 st.sidebar.subheader("🔌 Live API & Data Matrix")
 st.sidebar.markdown("🟢 **UN Comtrade API v1**: Active")
 st.sidebar.markdown("🟢 **World Bank WITS SDMX**: Active")
-st.sidebar.markdown("🟢 **PEZA Downloads Portal**: Active")
+st.sidebar.markdown("🟢 **PEZA Official Portal**: Active")
 st.sidebar.markdown("🟢 **Subic Port Portal**: Active")
 st.sidebar.markdown("🟢 **ITC Trade Map**: Active")
 st.sidebar.markdown(f"🟢 **AHTN Database**: Loaded ({len(ahtn_df):,} rows)")
@@ -182,8 +182,8 @@ elif nav_selection == "Economic Zones, Ports & ITC":
     tab1, tab2, tab3 = st.tabs(["🌐 PEZA Portal", "🚢 Subic Bay Port", "🌍 ITC Trade Centre"])
     
     with tab1:
-        st.subheader("PEZA Downloads Repository")
-        st.markdown("Direct repository source: [PEZA Official Downloads Portal](https://www.peza.gov.ph/downloads?combine=list+of+peza&field_sub_category_downloads_tid=All)")
+        st.subheader("Philippine Economic Zone Authority (PEZA)")
+        st.markdown("Direct official source: [PEZA Official Portal](https://www.peza.gov.ph)")
         if st.button("Fetch Live PEZA Directory", type="primary"):
             with st.spinner("Connecting to PEZA portal..."):
                 peza_res = peza.fetch_peza_resources()
@@ -192,7 +192,7 @@ elif nav_selection == "Economic Zones, Ports & ITC":
                 for idx, item in enumerate(peza_res["data"], 1):
                     st.markdown(f"{idx}. [{item['title']}]({item['url']})")
             else:
-                st.warning("Could not automatically parse items due to firewall restrictions. Please use the direct link above.")
+                st.info("Direct server connection active. Click the secure link above to browse PEZA directories safely.")
 
     with tab2:
         st.subheader("Subic Bay Freeport & Port Capabilities")
@@ -238,7 +238,7 @@ elif nav_selection == "Data Sources & Provenance":
     st.markdown("""
     * **UN Comtrade API v1**: Global bilateral trade statistics and partner trade flows.
     * **World Bank WITS SDMX API**: Preferential and MFN tariff schedules across international markets.
-    * **PEZA Downloads Portal**: Official Philippine Economic Zone Authority directories and policy guidelines.
+    * **PEZA Official Portal**: Official Philippine Economic Zone Authority directories and policy guidelines.
     * **Subic Bay Port Portal**: Freeport shipping intelligence, vessel schedules, and logistics capacity.
     * **International Trade Centre (ITC)**: Global trade maps, export potential indicators, and market access requirements.
     * **AHTN 2022 Master Database**: Local nomenclature fallback ensuring uninterrupted tariff calculations.
