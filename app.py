@@ -45,7 +45,7 @@ def load_ahtn_dataset():
 ahtn_df = load_ahtn_dataset()
 
 st.sidebar.title("🇵🇭 PH Trade Intelligence")
-st.sidebar.markdown("**FTA Market Access Scanner v3.3**")
+st.sidebar.markdown("**FTA Market Access Scanner v3.4**")
 st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
@@ -66,7 +66,7 @@ st.sidebar.markdown("🟢 **UN Comtrade API v1**: Active")
 st.sidebar.markdown("🟢 **World Bank WITS SDMX**: Active")
 st.sidebar.markdown("🟢 **PEZA Downloads Portal**: Active")
 st.sidebar.markdown("🟢 **Subic Port Portal**: Active")
-st.sidebar.markdown("🟢 **ITC Trade Map (intracen)**: Active")
+st.sidebar.markdown("🟢 **ITC Trade Map**: Active")
 st.sidebar.markdown(f"🟢 **AHTN Database**: Loaded ({len(ahtn_df)} rows)")
 
 if nav_selection == "Home / Executive Dashboard":
@@ -146,14 +146,14 @@ elif nav_selection == "Economic Zones, Ports & ITC":
     st.title("Economic Zones, Ports & ITC Trade Intelligence")
     st.markdown("Access official PEZA directories, Subic Bay port portals, and international trade analytics from the International Trade Centre (ITC).")
     
-    tab1, tab2, tab3 = st.tabs(["🌐 PEZA Portal", "🚢 Subic Bay Port", "🌍 ITC Trade Centre (intracen)"])
+    tab1, tab2, tab3 = st.tabs(["🌐 PEZA Portal", "🚢 Subic Bay Port", "🌍 ITC Trade Centre"])
     
     with tab1:
         st.subheader("PEZA Downloads Repository")
         st.markdown("Direct repository source: [PEZA Official Downloads Portal](https://www.peza.gov.ph/downloads?combine=list+of+peza&field_sub_category_downloads_tid=All)")
         if st.button("Fetch Live PEZA Directory", type="primary"):
             with st.spinner("Connecting to PEZA portal..."):
-                peza_res =peza.fetch_peza_resources()
+                peza_res = peza.fetch_peza_resources()
             if peza_res["status"] == "VERIFIED":
                 st.success("Successfully connected to PEZA portal!")
                 for idx, item in enumerate(peza_res["data"], 1):
@@ -177,20 +177,25 @@ elif nav_selection == "Economic Zones, Ports & ITC":
                 st.warning(f"Could not load live summary. Access directly via the link above.")
 
     with tab3:
-        st.subheader("International Trade Centre (ITC) Global Intelligence")
-        st.markdown("Direct platform source: [International Trade Centre Portal](https://www.intracen.org/)")
-        st.markdown("ITC provides global trade statistics, market access maps, and export potential evaluations.")
-        if st.button("Fetch Live ITC Intelligence Feed", type="primary"):
+        st.subheader("International Trade Centre (ITC) & MyITC Portal")
+        st.markdown("Access global trade analytics resources and institutional portals.")
+        
+        col_a, col_b = st.columns(2)
+        with col_a:
+            st.markdown("🔗 [Open Public ITC Resources Portal](https://www.intracen.org/)")
+        with col_b:
+            st.markdown("🔐 [Open Secure MyITC Login Portal](https://myitc.intracen.org/)")
+
+        if st.button("Fetch Live ITC Public Feed", type="primary"):
             with st.spinner("Connecting to intracen.org..."):
                 itc_res = itc_prov.fetch_itc_intelligence()
             if itc_res["status"] == "VERIFIED":
-                st.success("Successfully retrieved ITC trade platform summary!")
+                st.success("Successfully retrieved ITC platform summary!")
                 st.markdown(f"**Platform Portal**: {itc_res['title']}")
                 for ins in itc_res["insights"][:5]:
                     st.markdown(f"* {ins}")
-                st.markdown(f"🔗 [Open Official ITC Portal]({itc_res['url']})")
             else:
-                st.warning("Could not connect to live feed. Access directly via [intracen.org](https://www.intracen.org/).")
+                st.warning("Could not load live feed. Use the direct portal links above.")
 
 elif nav_selection == "Data Sources & Provenance":
     st.title("Data Sources & Provenance")
