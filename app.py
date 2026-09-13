@@ -174,7 +174,7 @@ elif nav_selection == "Economic Zones, Ports & ITC":
                     st.markdown(f"* {highlight}")
                 st.markdown(f"🔗 [Open Full Subic Bay Port Portal]({subic_res['url']})")
             else:
-                st.warning(f"Could not load live summary. Access directly via the link above.")
+                st.warning("Could not load live summary. Access directly via the link above.")
 
     with tab3:
         st.subheader("International Trade Centre (ITC) & MyITC Portal")
