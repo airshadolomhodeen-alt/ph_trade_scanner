@@ -1,65 +1,24 @@
-import pandas as pd
-
-def get_trade_metrics(flow_type):
-    """Returns official trade partner rankings and economic zone data sources."""
-    if flow_type == "Exports":
-        return pd.DataFrame([
-            {"Rank": 1, "Partner Country": "United States", "Share (%)": 15.7, "Est. Annual Value (USD B)": 13.44, "Primary PH Export Sectors": "Semiconductors & Electronics", "Data Source": "UN Comtrade / WITS"},
-            {"Rank": 2, "Partner Country": "Japan", "Share (%)": 14.0, "Est. Annual Value (USD B)": 11.50, "Primary PH Export Sectors": "Ignition Wiring Sets", "Data Source": "UN Comtrade / PJEPA"},
-            {"Rank": 3, "Partner Country": "Hong Kong", "Share (%)": 13.2, "Est. Annual Value (USD B)": 10.80, "Primary PH Export Sectors": "Machinery & Equipment", "Data Source": "UN Comtrade"},
-            {"Rank": 4, "Partner Country": "Mainland China", "Share (%)": 11.3, "Est. Annual Value (USD B)": 10.46, "Primary PH Export Sectors": "Processed Foods & Beverages", "Data Source": "UN Comtrade / ASEANStats"},
-            {"Rank": 5, "Partner Country": "South Korea", "Share (%)": 4.9, "Est. Annual Value (USD B)": 3.54, "Primary PH Export Sectors": "Coconut Oil & Derivatives", "Data Source": "PKFTA / ASEANStats"},
-            {"Rank": 6, "Partner Country": "Singapore", "Share (%)": 4.7, "Est. Annual Value (USD B)": 3.53, "Primary PH Export Sectors": "Copper Metal Products", "Data Source": "ASEANStats"},
-            {"Rank": 7, "Partner Country": "Netherlands", "Share (%)": 4.2, "Est. Annual Value (USD B)": 3.60, "Primary PH Export Sectors": "Chemical Products", "Data Source": "ITC Trade Map"},
-            {"Rank": 8, "Partner Country": "Thailand", "Share (%)": 4.0, "Est. Annual Value (USD B)": 2.93, "Primary PH Export Sectors": "Apparel & Clothing", "Data Source": "ASEANStats"},
-            {"Rank": 9, "Partner Country": "Taiwan", "Share (%)": 3.7, "Est. Annual Value (USD B)": 2.64, "Primary PH Export Sectors": "Ignition Parts", "Data Source": "WITS Database"},
-            {"Rank": 10, "Partner Country": "Germany", "Share (%)": 3.4, "Est. Annual Value (USD B)": 2.49, "Primary PH Export Sectors": "Miscellaneous Manufactures", "Data Source": "ITC Trade Map"}
-        ])
-    else:
-        return pd.DataFrame([
-            {"Rank": 1, "Partner Country": "Mainland China", "Share (%)": 22.5, "Est. Annual Value (USD B)": 28.50, "Primary PH Import Sectors": "Electronic Components & Raw Materials", "Data Source": "UN Comtrade"},
-            {"Rank": 2, "Partner Country": "Indonesia", "Share (%)": 8.4, "Est. Annual Value (USD B)": 10.60, "Primary PH Import Sectors": "Mineral Fuels, Coal & Automotive", "Data Source": "ASEANStats"},
-            {"Rank": 3, "Partner Country": "Japan", "Share (%)": 7.8, "Est. Annual Value (USD B)": 9.90, "Primary PH Import Sectors": "Machinery & Specialized Equipment", "Data Source": "UN Comtrade / PJEPA"},
-            {"Rank": 4, "Partner Country": "United States", "Share (%)": 6.7, "Est. Annual Value (USD B)": 8.50, "Primary PH Import Sectors": "Cereals, Electronics & Capital Goods", "Data Source": "UN Comtrade"},
-            {"Rank": 5, "Partner Country": "South Korea", "Share (%)": 6.5, "Est. Annual Value (USD B)": 8.24, "Primary PH Import Sectors": "Semi-conductor Devices & Machinery", "Data Source": "PKFTA"},
-            {"Rank": 6, "Partner Country": "Thailand", "Share (%)": 6.2, "Est. Annual Value (USD B)": 7.85, "Primary PH Import Sectors": "Parts of Motor Vehicles & Rice", "Data Source": "ASEANStats"},
-            {"Rank": 7, "Partner Country": "Malaysia", "Share (%)": 5.4, "Est. Annual Value (USD B)": 6.84, "Primary PH Import Sectors": "Electrical Machinery & Petroleum", "Data Source": "ASEANStats"},
-            {"Rank": 8, "Partner Country": "Taiwan", "Share (%)": 4.8, "Est. Annual Value (USD B)": 6.08, "Primary PH Import Sectors": "Integrated Circuits & Raw Plastics", "Data Source": "WITS Database"},
-            {"Rank": 9, "Partner Country": "Singapore", "Share (%)": 3.9, "Est. Annual Value (USD B)": 4.94, "Primary PH Import Sectors": "Mineral Fuels & Chemicals", "Data Source": "ASEANStats"},
-            {"Rank": 10, "Partner Country": "Vietnam", "Share (%)": 3.5, "Est. Annual Value (USD B)": 4.43, "Primary PH Import Sectors": "Cereals, Animal Feeds & Electronics", "Data Source": "ASEANStats"}
-        ])
-
-def get_economic_zones_directory():
+def get_top_ph_trading_partners():
+    """Returns official baseline metrics for the Top 20 Philippine Trading Partners (USD Millions)."""
     return [
-        {"Zone Authority": "Bureau of Customs (BOC)", "Official Portal": "https://customs.gov.ph/", "Core Mandate": "Implements CMTA (RA 10863), manages tariff collection, import/export clearance, and FTA Origin Management Systems.", "Key Advantages": "E2M / Value Added Service Providers (VASP) integration, Secure electronic payments."},
-        {"Zone Authority": "Tariff Commission (Philippine Tariff Finder)", "Official Portal": "https://finder.tariffcommission.gov.ph/", "Core Mandate": "Houses all 14 Philippine tariff schedules (MFN and 13 FTAs).", "Key Advantages": "Accurate commodity nomenclature classification and tariff lookups."},
-        {"Zone Authority": "Philippine Economic Zone Authority (PEZA)", "Official Portal": "https://www.peza.gov.ph/", "Core Mandate": "Promotes investments and public/private ecozones.", "Key Advantages": "Tax holidays (ITH), 5% SCIT under RA 12066."},
-        {"Zone Authority": "Subic Bay Freeport Zone (SBMA)", "Official Portal": "https://www.mysubicbay.com.ph/", "Core Mandate": "Manages Subic Bay transshipment and logistics hub.", "Key Advantages": "Duty-free importation of capital equipment."},
-        {"Zone Authority": "ASEAN Trade Repository", "Official Portal": "https://data.aseanstats.org/", "Core Mandate": "Official intra-ASEAN trade statistics.", "Key Advantages": "Benchmark for ATIGA compliance."},
-        {"Zone Authority": "Labor & Employment Compliance", "Official Portal": "https://www.afablabor.com/", "Core Mandate": "Monitors labor standards across special economic zones.", "Key Advantages": "Workforce compliance guidelines."}
-    ]
-
-def get_trade_news_feed():
-    return [
-        {
-            "Headline": "Philippine Exports Extend Growth Streak; Electronics & Coconut Products Drive Strong Inflow",
-            "Category": "Export Performance",
-            "Date": "September 2026",
-            "Source": "DTI / PSA / PortCalls",
-            "Summary": "Philippine merchandise exports continue an upward trajectory, led by robust global demand for semiconductors, AI-related components, and coconut-based derivatives."
-        },
-        {
-            "Headline": "Bureau of Customs Deploys FTA Origin Management System (OMS) for Streamlined Preferential Tariffs",
-            "Category": "BOC & Tariffs",
-            "Date": "September 2026",
-            "Source": "BOC (customs.gov.ph)",
-            "Summary": "The Bureau of Customs implements CMO rules for online Product Evaluation Reports (PER) and digital Certificate of Origin verifications, drastically lowering compliance turnaround times for traders."
-        },
-        {
-            "Headline": "PEZA Targets ₱300-Billion in New Investments and Expanded Ecozone Developments",
-            "Category": "Economic Zones & FDI",
-            "Date": "September 2026",
-            "Source": "PEZA (peza.gov.ph)",
-            "Summary": "The Philippine Economic Zone Authority pushes for export-oriented enterprise registrations, leveraging the enhanced fiscal incentives under the CREATE MORE Act (RA 12066)."
-        }
+        {"Rank": 1, "Country": "China", "Total Trade": 39500, "Exports": 13800, "Imports": 25700, "Trade Balance": -11900, "Share (%)": 16.2},
+        {"Rank": 2, "Country": "United States", "Total Trade": 22400, "Exports": 11500, "Imports": 10900, "Trade Balance": 600, "Share (%)": 9.2},
+        {"Rank": 3, "Country": "Japan", "Total Trade": 20800, "Exports": 11200, "Imports": 9600, "Trade Balance": 1600, "Share (%)": 8.5},
+        {"Rank": 4, "Country": "Hong Kong", "Total Trade": 12600, "Exports": 11100, "Imports": 1500, "Trade Balance": 9600, "Share (%)": 5.2},
+        {"Rank": 5, "Country": "South Korea", "Total Trade": 15200, "Exports": 3800, "Imports": 11400, "Trade Balance": -7600, "Share (%)": 6.2},
+        {"Rank": 6, "Country": "Singapore", "Total Trade": 12100, "Exports": 4300, "Imports": 7800, "Trade Balance": -3500, "Share (%)": 5.0},
+        {"Rank": 7, "Country": "Thailand", "Total Trade": 8400, "Exports": 2100, "Imports": 6300, "Trade Balance": -4200, "Share (%)": 3.4},
+        {"Rank": 8, "Country": "Indonesia", "Total Trade": 8200, "Exports": 1100, "Imports": 7100, "Trade Balance": -6000, "Share (%)": 3.4},
+        {"Rank": 9, "Country": "Malaysia", "Total Trade": 7900, "Exports": 2500, "Imports": 5400, "Trade Balance": -2900, "Share (%)": 3.2},
+        {"Rank": 10, "Country": "Taiwan", "Total Trade": 9100, "Exports": 2100, "Imports": 7000, "Trade Balance": -4900, "Share (%)": 3.7},
+        {"Rank": 11, "Country": "Germany", "Total Trade": 5500, "Exports": 3100, "Imports": 2400, "Trade Balance": 700, "Share (%)": 2.3},
+        {"Rank": 12, "Country": "Vietnam", "Total Trade": 7200, "Exports": 1000, "Imports": 6200, "Trade Balance": -5200, "Share (%)": 3.0},
+        {"Rank": 13, "Country": "Netherlands", "Total Trade": 3400, "Exports": 2700, "Imports": 700, "Trade Balance": 2000, "Share (%)": 1.4},
+        {"Rank": 14, "Country": "Australia", "Total Trade": 4100, "Exports": 500, "Imports": 3600, "Trade Balance": -3100, "Share (%)": 1.7},
+        {"Rank": 15, "Country": "United Kingdom", "Total Trade": 2100, "Exports": 1300, "Imports": 800, "Trade Balance": 500, "Share (%)": 0.9},
+        {"Rank": 16, "Country": "Saudi Arabia", "Total Trade": 2500, "Exports": 200, "Imports": 2300, "Trade Balance": -2100, "Share (%)": 1.0},
+        {"Rank": 17, "Country": "Canada", "Total Trade": 1400, "Exports": 700, "Imports": 700, "Trade Balance": 0, "Share (%)": 0.6},
+        {"Rank": 18, "Country": "France", "Total Trade": 2200, "Exports": 1200, "Imports": 1000, "Trade Balance": 200, "Share (%)": 0.9},
+        {"Rank": 19, "Country": "Switzerland", "Total Trade": 1800, "Exports": 1000, "Imports": 800, "Trade Balance": 200, "Share (%)": 0.7},
+        {"Rank": 20, "Country": "United Arab Emirates", "Total Trade": 1600, "Exports": 400, "Imports": 1200, "Trade Balance": -800, "Share (%)": 0.7}
     ]
