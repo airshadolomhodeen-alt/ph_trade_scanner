@@ -1,6 +1,8 @@
+from providers.comtrade_provider import ComtradeProvider
+
 class OpportunityEngine:
     def __init__(self):
-        pass
+        self.comtrade = ComtradeProvider()
 
     def calculate_opportunity_score(self, tariff_margin: float, market_size: float):
         score = min(100.0, (tariff_margin * 3.5) + (market_size / 1000000.0 * 0.1))
@@ -16,7 +18,7 @@ class OriginEngine:
         
         rvc = ((fob_value - non_originating_value) / fob_value) * 100.0
         rvc_round = round(rvc, 2)
-        threshold = 40.0 # Standard RVC threshold
+        threshold = 40.0
         
         return {
             "rvc_percentage": rvc_round,
