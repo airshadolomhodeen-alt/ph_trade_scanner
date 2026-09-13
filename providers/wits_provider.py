@@ -3,14 +3,14 @@ import requests
 
 class WitsProvider:
     def __init__(self):
-        # World Bank WITS SDMX REST API base endpoint
+        # World Bank WITS SDMX REST API base endpoint for real tariff data
         self.base_url = "https://wits.worldbank.org/API/V1/SDMX/V21/rest"
         
     def fetch_tariff_data(self, reporter: str, partner: str, product_code: str):
         """
-        Fetches preferential and MFN tariff rates from World Bank WITS API.
-        Reporter: ISO numeric or alpha-3 (e.g., 608 or PHL for Philippines)
-        Partner: Partner country code or 'WLD' for world
+        Fetches official preferential and MFN tariff rates from World Bank WITS SDMX API.
+        Reporter: ISO alpha-3 or numeric (e.g., 'PHL' or '608' for Philippines)
+        Partner: Partner country ISO or 'WLD' for world
         Product Code: 6-digit HS code
         """
         dataset_id = "DF_WITS_Tariff_TariffLines"
