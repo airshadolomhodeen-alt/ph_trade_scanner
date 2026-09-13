@@ -6,7 +6,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class ItcProvider:
     def __init__(self):
-        self.url = "https://www.intracen.org/resources/data-and-analysis/trade-statistics"
+        # Pointing to public ITC data & analysis resources to avoid login walls
+        self.url = "https://www.intracen.org/resources/data-and-analysis"
+        self.login_url = "https://myitc.intracen.org/"
         
     def fetch_itc_intelligence(self):
         headers = {
@@ -29,7 +31,8 @@ class ItcProvider:
                     "source": "International Trade Centre (ITC)",
                     "title": title,
                     "insights": features[:6],
-                    "url": "https://www.intracen.org/"
+                    "url": "https://www.intracen.org/",
+                    "myitc_portal": self.login_url
                 }
             else:
                 return {
