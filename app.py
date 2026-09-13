@@ -6,6 +6,7 @@ from providers.comtrade_provider import ComtradeProvider
 from providers.wits_provider import WitsProvider
 from providers.peza_provider import PezaProvider
 from providers.subic_port_provider import SubicPortProvider
+from providers.itc_provider import ItcProvider
 
 from tariff_engine import TariffEngine
 from fta_analyzer import FTAEngine
@@ -22,6 +23,7 @@ comtrade = ComtradeProvider()
 wits = WitsProvider()
 peza = PezaProvider()
 subic_port = SubicPortProvider()
+itc_prov = ItcProvider()
 
 tariff_eng = TariffEngine()
 fta_eng = FTAEngine()
@@ -43,7 +45,7 @@ def load_ahtn_dataset():
 ahtn_df = load_ahtn_dataset()
 
 st.sidebar.title("🇵🇭 PH Trade Intelligence")
-st.sidebar.markdown("**FTA Market Access Scanner v3.2**")
+st.sidebar.markdown("**FTA Market Access Scanner v3.3**")
 st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
@@ -51,9 +53,9 @@ nav_selection = st.sidebar.radio(
     [
         "Home / Executive Dashboard",
         "AHTN 2022 Product Scanner",
-        "Market Access & Dual-API Engine",
+        "Market Access & Multi-API Engine",
         "Rules of Origin Calculator",
-        "Economic Zones & BARMM",
+        "Economic Zones, Ports & ITC",
         "Data Sources & Provenance"
     ]
 )
@@ -64,6 +66,7 @@ st.sidebar.markdown("🟢 **UN Comtrade API v1**: Active")
 st.sidebar.markdown("🟢 **World Bank WITS SDMX**: Active")
 st.sidebar.markdown("🟢 **PEZA Downloads Portal**: Active")
 st.sidebar.markdown("🟢 **Subic Port Portal**: Active")
+st.sidebar.markdown("🟢 **ITC Trade Map (intracen)**: Active")
 st.sidebar.markdown(f"🟢 **AHTN Database**: Loaded ({len(ahtn_df)} rows)")
 
 if nav_selection == "Home / Executive Dashboard":
@@ -75,8 +78,8 @@ if nav_selection == "Home / Executive Dashboard":
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Nomenclature", "AHTN 2022")
     c2.metric("Supported FTAs", "10+ Agreements")
-    c3.metric("Live APIs", "4 Providers")
-    c4.metric("Economic Zones", "PEZA & Subic Freeport")
+    c3.metric("Live APIs", "5 Providers")
+    c4.metric("Global Trade Maps", "ITC Integrated")
 
 elif nav_selection == "AHTN 2022 Product Scanner":
     st.title("AHTN 2022 Product & HS Code Scanner")
@@ -92,7 +95,7 @@ elif nav_selection == "AHTN 2022 Product Scanner":
     else:
         st.error("`ahtn_2022_master.csv` not found in root directory.")
 
-elif nav_selection == "Market Access & Dual-API Engine":
+elif nav_selection == "Market Access & Multi-API Engine":
     st.title("Market Access & Multi-API Analytics Engine")
     
     col1, col2 = st.columns(2)
@@ -104,7 +107,7 @@ elif nav_selection == "Market Access & Dual-API Engine":
         year = st.selectbox("Trade Data Year:", ["2025", "2024", "2023"])
 
     if st.button("Execute Live Multi-API Scan", type="primary"):
-        with st.spinner("Querying UN Comtrade & WITS databases..."):
+        with st.spinner("Querying UN Comtrade, WITS, and global trade databases..."):
             partner_map = {"Japan (392)": "392", "South Korea (410)": "410", "China (156)": "156", "United States (842)": "842"}
             p_code = partner_map.get(market, "392")
             
@@ -139,18 +142,18 @@ elif nav_selection == "Rules of Origin Calculator":
         else:
             st.warning("⚠️ Below threshold requirements.")
 
-elif nav_selection == "Economic Zones & BARMM":
-    st.title("Philippine Economic Zones, Ports & BARMM Intelligence")
-    st.markdown("Access official PEZA directories, Subic Bay port specifications, and trade policy updates.")
+elif nav_selection == "Economic Zones, Ports & ITC":
+    st.title("Economic Zones, Ports & ITC Trade Intelligence")
+    st.markdown("Access official PEZA directories, Subic Bay port portals, and international trade analytics from the International Trade Centre (ITC).")
     
-    tab1, tab2 = st.tabs(["🌐 PEZA Portal Integration", "🚢 Subic Bay Port Intelligence"])
+    tab1, tab2, tab3 = st.tabs(["🌐 PEZA Portal", "🚢 Subic Bay Port", "🌍 ITC Trade Centre (intracen)"])
     
     with tab1:
         st.subheader("PEZA Downloads Repository")
         st.markdown("Direct repository source: [PEZA Official Downloads Portal](https://www.peza.gov.ph/downloads?combine=list+of+peza&field_sub_category_downloads_tid=All)")
         if st.button("Fetch Live PEZA Directory", type="primary"):
             with st.spinner("Connecting to PEZA portal..."):
-                peza_res = peza.fetch_peza_resources()
+                peza_res =peza.fetch_peza_resources()
             if peza_res["status"] == "VERIFIED":
                 st.success("Successfully connected to PEZA portal!")
                 for idx, item in enumerate(peza_res["data"], 1):
@@ -167,13 +170,28 @@ elif nav_selection == "Economic Zones & BARMM":
             if subic_res["status"] == "VERIFIED":
                 st.success("Successfully retrieved Subic Bay port profile!")
                 st.markdown(f"**Portal Title**: {subic_res['title']}")
-                st.markdown("### Port Highlights & Features:")
                 for highlight in subic_res["highlights"][:5]:
                     st.markdown(f"* {highlight}")
                 st.markdown(f"🔗 [Open Full Subic Bay Port Portal]({subic_res['url']})")
             else:
-                st.warning(f"Could not load live summary ({subic_res.get('message', 'Timeout')}). Access directly via the link above.")
+                st.warning(f"Could not load live summary. Access directly via the link above.")
+
+    with tab3:
+        st.subheader("International Trade Centre (ITC) Global Intelligence")
+        st.markdown("Direct platform source: [International Trade Centre Portal](https://www.intracen.org/)")
+        st.markdown("ITC provides global trade statistics, market access maps, and export potential evaluations.")
+        if st.button("Fetch Live ITC Intelligence Feed", type="primary"):
+            with st.spinner("Connecting to intracen.org..."):
+                itc_res = itc_prov.fetch_itc_intelligence()
+            if itc_res["status"] == "VERIFIED":
+                st.success("Successfully retrieved ITC trade platform summary!")
+                st.markdown(f"**Platform Portal**: {itc_res['title']}")
+                for ins in itc_res["insights"][:5]:
+                    st.markdown(f"* {ins}")
+                st.markdown(f"🔗 [Open Official ITC Portal]({itc_res['url']})")
+            else:
+                st.warning("Could not connect to live feed. Access directly via [intracen.org](https://www.intracen.org/).")
 
 elif nav_selection == "Data Sources & Provenance":
     st.title("Data Sources & Provenance")
-    st.markdown("All datasets are sourced directly from UN Comtrade API, World Bank WITS API, PEZA Portal, Subic Bay Port Portal, ASEAN Secretariat, and Philippine Tariff Commission.")
+    st.markdown("All datasets are sourced directly from UN Comtrade API, World Bank WITS API, PEZA Portal, Subic Bay Port Portal, International Trade Centre (intracen.org), ASEAN Secretariat, and Philippine Tariff Commission.")
