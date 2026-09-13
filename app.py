@@ -1,160 +1,176 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
-from tariff_engine import search_ahtn_database
-from fta_analyzer import analyze_market_potential, check_create_more_eligibility, get_ph_fta_database
+import os
 
-# --- Page Configuration ---
+# Import functions from your root-level Python modules
+from trade_stats import get_top_ph_trading_partners
+from tariff_engine import get_tariff_rates
+from fta_analyzer import calculate_global_demand_and_supply, get_top_competitors
+
+# --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="FTA Market Access Scanner | Philippine Trade Intelligence", 
-    page_icon="🇵🇭", 
-    layout="wide"
+    page_title="FTA Market Access Scanner | Phil. Trade Intelligence",
+    page_icon="🇵🇭",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# --- Professional Institutional Styling ---
-st.markdown("""
-    <style>
-    .main {background-color: #F8FAFC;}
-    .portal-title {
-        font-size: 1.9rem; 
-        font-weight: 800; 
-        color: #0F172A; 
-        letter-spacing: -0.5px;
-        margin-bottom: 0px;
-    }
-    .portal-subtitle {
-        font-size: 0.95rem; 
-        color: #475569; 
-        font-weight: 500;
-        margin-top: 4px;
-        margin-bottom: 15px;
-    }
-    .provenance-badge {
-        background-color: #FEF3C7; 
-        color: #92400E; 
-        border: 1px solid #FCD34D;
-        padding: 4px 10px; 
-        border-radius: 4px; 
-        font-size: 0.75rem; 
-        font-weight: 600;
-        display: inline-block;
-    }
-    .verified-badge {
-        background-color: #ECFDF5; 
-        color: #065F46; 
-        border: 1px solid #A7F3D0;
-        padding: 4px 10px; 
-        border-radius: 4px; 
-        font-size: 0.75rem; 
-        font-weight: 600;
-        display: inline-block;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# --- LOAD AHTN DATASET CACHE ---
+@st.cache_data
+def load_ahtn_data():
+    csv_path = "ahtn_2022_master.csv"
+    if os.path.exists(csv_path):
+        try:
+            return pd.read_csv(csv_path, encoding="latin-1")
+        except Exception:
+            return pd.DataFrame()
+    return pd.DataFrame()
 
-# --- Header & Provenance Banner ---
-col_head1, col_head2 = st.columns([3, 1])
-with col_head1:
-    st.markdown('<p class="portal-title">🇵🇭 FTA Market Access Scanner</p>', unsafe_allow_html=True)
-    st.markdown('<p class="portal-subtitle">Philippine Export & Trade Intelligence Platform | Decision Support System</p>', unsafe_allow_html=True)
-with col_head2:
-    st.markdown('<div style="text-align: right;"><span class="verified-badge">🟢 STATUS: ACTIVE ENGINE</span></div>', unsafe_allow_html=True)
+df_ahtn = load_ahtn_data()
 
-st.markdown("---")
+# --- SIDEBAR NAVIGATION ---
+st.sidebar.title("🇵🇭 FTA Market Access Scanner")
+st.sidebar.markdown("**Philippine Export & Trade Intelligence**")
+st.sidebar.divider()
 
-# --- Structured Multi-Tab Navigation ---
-tab_home, tab_scanner, tab_market_access, tab_fta, tab_origin, tab_economic_zones, tab_sources = st.tabs([
-    "🏠 Home / Overview", 
-    "🔍 Product Scanner", 
-    "📊 Market Access Snapshot", 
-    "🌐 FTA Database", 
-    "⚖️ Rules of Origin (ROO)", 
-    "🏛️ Economic Zones & CREATE MORE", 
-    "📚 Data Sources & Provenance"
-])
+nav_page = st.sidebar.radio(
+    "Navigation Menu",
+    [
+        "Home & Executive Overview", 
+        "Product Scanner (AHTN)", 
+        "Market Access & Demand Engine", 
+        "Top 20 Trade Partners Dashboard", 
+        "Economic Zones & BARMM", 
+        "About & Data Sources"
+    ]
+)
 
-with tab_home:
-    st.subheader("Find the Best Market for Your Philippine Product")
-    st.markdown("Analyze FTA market access, tariffs, Rules of Origin, trade demand, and Philippine economic-zone advantages.")
+# --- PAGE 1: HOME & EXECUTIVE OVERVIEW ---
+if nav_page == "Home & Executive Overview":
+    st.title("🇵🇭 Philippine Export & Trade Intelligence Platform")
+    st.markdown("### *Empowering Exporters, Trade Policymakers, and Investors with Actionable Data-Driven Insights*")
     
-    col_w1, col_w2, col_w3 = st.columns(3)
-    with col_w1:
-        st.info("**1. Select Product & HS Code**\n\nSearch across AHTN-2022 nomenclature for verified product classifications.")
-    with col_w2:
-        st.info("**2. Evaluate Market & FTAs**\n\nCompare MFN versus preferential FTA tariff rates and preference margins.")
-    with col_w3:
-        st.info("**3. Assess Origin & Incentives**\n\nReview Rules of Origin criteria and PEZA / CREATE MORE Act (RA 12066) incentives.")
+    st.divider()
+    
+    st.subheader("📌 Executive Summary: Why This Platform Matters")
+    st.markdown("""
+    Navigating international trade requires answering critical strategic questions before committing capital or shipping goods. This platform bridges the information gap by synthesizing complex customs nomenclature (AHTN), Preferential Tariffs under Philippine Free Trade Agreements (FTAs), Rules of Origin, and global trade flows into a unified decision-support engine. 
+    
+    Specifically, this platform is engineered to resolve four pillars of modern trade intelligence:
+    1. **Where is global demand highest?** By analyzing global import trends and partner consumption indices, exporters can instantly pinpoint high-growth destination countries for specific product lines.
+    2. **Who are the top 20 trading partners of the Philippines?** Providing a granular breakdown of major bilateral trade flows, export volumes, and persistent trade deficits or surpluses.
+    3. **How are trade balances, supply, and demand calculated?** Using econometric gravity models combined with verified UN Comtrade and PSA baseline data to compute apparent consumption, market gaps, and national comparative advantages.
+    4. **How do we diagnose specific export products and competitive positioning?** By cross-referencing AHTN codes against MFN vs. FTA preferential tariffs, calculating preference margins, and evaluating dominant competitor nations in target markets.
+    """)
+    
+    st.divider()
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Active Philippine FTAs", "12 Agreements", "RCEP, ATIGA, AJCEPA, etc.")
+    col2.metric("Tracked Trading Partners", "Top 20 Nations", "Covering >85% of Total Trade")
+    col3.metric("Nomenclature Database", "AHTN 2022 Standard", f"{len(df_ahtn)} Records Loaded")
 
-with tab_scanner:
-    st.subheader("AHTN-2022 Product Nomenclature & Tariff Scanner")
-    search_query = st.text_input("Enter HS Code or Keyword (e.g., 'Coconut', 'Bananas', '8542')", "Coconut")
-    results = search_ahtn_database(search_query)
-    if results:
-        st.success(f"Matched {len(results)} nomenclature records.")
-        st.dataframe(pd.DataFrame(results), use_container_width=True, hide_index=True)
+# --- PAGE 2: PRODUCT SCANNER (AHTN) ---
+elif nav_page == "Product Scanner (AHTN)":
+    st.title("🔍 AHTN 2022 Product Code Scanner")
+    st.markdown("Search through official AHTN product classifications to identify exact headings, chapters, and descriptions.")
+    
+    search_query = st.text_input("Enter product keyword or HS/AHTN code (e.g., 'coconut', '1513', 'electronics')", "1513")
+    
+    if not df_ahtn.empty:
+        mask = df_ahtn.astype(str).apply(lambda x: x.str.contains(search_query, case=False, na=False)).any(axis=1)
+        filtered_df = df_ahtn[mask]
+        
+        st.write(f"Found **{len(filtered_df)}** matching records for query: `{search_query}`")
+        st.dataframe(filtered_df.head(100), use_container_width=True)
     else:
-        st.warning("DATA CURRENTLY UNAVAILABLE for this query.")
+        st.warning("AHTN master dataset (`ahtn_2022_master.csv`) not found or empty in working directory.")
+        sample_data = [
+            {"NomenclatureCode": "AHTN 2022", "ProductCode": "151311", "Product Description": "Crude coconut (copra) oil"},
+            {"NomenclatureCode": "AHTN 2022", "ProductCode": "080390", "Product Description": "Fresh or dried bananas"},
+            {"NomenclatureCode": "AHTN 2022", "ProductCode": "854231", "Product Description": "Electronic integrated circuits as processors and controllers"}
+        ]
+        st.dataframe(pd.DataFrame(sample_data), use_container_width=True)
 
-with tab_market_access:
-    st.subheader("Market Access Opportunity & Gravity Assessment")
+# --- PAGE 3: MARKET ACCESS & DEMAND ENGINE ---
+elif nav_page == "Market Access & Demand Engine":
+    st.title("🌐 Market Access, Demand & Supply Engine")
+    st.markdown("Evaluate target market import demand, preference margins, and competitor supply for any Philippine export product.")
+    
     c1, c2, c3 = st.columns(3)
     with c1:
-        demand = st.number_input("Target Market Import Demand (USD M)", value=250.0)
+        hs_input = st.text_input("HS / AHTN Code", "1513.11")
     with c2:
-        adv = st.number_input("Tariff Preference Margin (%) [MFN minus FTA]", value=5.0)
+        market_input = st.selectbox("Target Export Market", ["United States", "Japan", "China", "South Korea", "Germany", "Singapore", "Australia", "Thailand"])
     with c3:
-        log = st.slider("Logistics Index (0 to 1)", 0.0, 1.0, 0.8)
+        fta_input = st.selectbox("Applicable FTA", ["RCEP", "ATIGA (ASEAN)", "AJCEPA (Japan)", "AKFTA (Korea)", "PH-EFTA", "MFN (No FTA)"])
         
-    if st.button("Calculate Opportunity Score", type="primary"):
-        score, tier = analyze_market_potential(demand, adv, log)
-        st.metric(label="FTA Market Access Opportunity Score", value=f"{score} / 100")
-        st.info(f"**Classification:** {tier}")
+    if st.button("Run Market Access & Demand Analysis"):
+        metrics = calculate_global_demand_and_supply(hs_input, market_input)
+        tariff_info = get_tariff_rates(hs_input, fta_input)
+        competitors = get_top_competitors(hs_input, market_input)
+        
+        st.success(f"Analysis Complete for HS Code `{hs_input}` in `{market_input}` via `{fta_input}`")
+        
+        col_a, col_b, col_c, col_d = st.columns(4)
+        col_a.metric("Total Import Demand", f"${metrics['Total Import Demand (USD M)']:,} M")
+        col_b.metric("PH Export Value", f"${metrics['PH Export Value (USD M)']:,} M")
+        col_c.metric("Preference Margin", f"{tariff_info['Preference Margin (%)']}%")
+        col_d.metric("Opportunity Score", f"{metrics['Market Opportunity Score']} / 100")
+        
+        st.divider()
+        st.subheader("📋 Tariff & Rules of Origin Analysis")
+        st.json(tariff_info)
+        
+        st.subheader("📊 Competitor Supply Analysis in Target Market")
+        st.dataframe(competitors, use_container_width=True)
 
-with tab_fta:
-    st.subheader("Structured Philippine Free Trade Agreements (FTAs)")
-    st.markdown("Verified preferential trade agreements maintained by the DTI and Tariff Commission.")
-    fta_db = get_ph_fta_database()
-    st.dataframe(pd.DataFrame(fta_db), use_container_width=True, hide_index=True)
-
-with tab_origin:
-    st.subheader("Rules of Origin (ROO) & Origin Assessment Engine")
-    st.markdown("Determine whether your export product potentially qualifies for preferential tariff treatment.")
-    st.markdown("> **Note:** Products are classified as **POTENTIALLY ELIGIBLE** pending submission of a formal Product Evaluation Report (PER) and supporting documentation.")
+# --- PAGE 4: TOP 20 TRADE PARTNERS DASHBOARD ---
+elif nav_page == "Top 20 Trade Partners Dashboard":
+    st.title("📊 Top 20 Philippine Trading Partners Dashboard")
+    st.markdown("Empirical overview of the top 20 bilateral trade partners, total trade values, export/import shares, and trade balances.")
     
-    col_o1, col_o2 = st.columns(2)
-    with col_o1:
-        fob = st.number_input("FOB Export Value (USD)", value=10000.0)
-        non_orig = st.number_input("Non-Originating Material Cost (USD)", value=3000.0)
-    with col_o2:
-        rvc = ((fob - non_orig) / fob) * 100
-        st.metric(label="Calculated Regional Value Content (RVC)", value=f"{rvc:.1f}%")
-        if rvc >= 40.0:
-            st.success("✅ **Status:** POTENTIALLY ELIGIBLE (Exceeds standard 40% RVC threshold).")
-        else:
-            st.warning("⚠️ **Status:** INSUFFICIENT RVC (Below 40% threshold).")
+    partners_df = pd.DataFrame(get_top_ph_trading_partners())
+    st.dataframe(partners_df, use_container_width=True)
+    
+    st.info("💡 **Trade Balance Insight:** The Philippines typically maintains a trade deficit with raw material and fuel suppliers like China, Indonesia, and South Korea, while securing robust trade surpluses with export destinations like the United States, Hong Kong, and Japan.")
 
-with tab_economic_zones:
-    st.subheader("Economic Zones & CREATE MORE Act (RA 12066) Compliance")
-    col_e1, col_e2 = st.columns(2)
-    with col_e1:
-        is_ree = st.checkbox("Is your enterprise a Registered Export Enterprise (REE)?", value=True)
-        ratio = st.slider("Export Ratio (%)", 0.0, 100.0, 80.0)
-    with col_e2:
-        attr = st.checkbox("Directly attributable to export activity?", value=True)
+# --- PAGE 5: ECONOMIC ZONES & BARMM ---
+elif nav_page == "Economic Zones & BARMM":
+    st.title("🏭 Philippine Economic Zones & BARMM Intelligence")
+    st.markdown("Analyze strategic investment locations, fiscal incentives under the CREATE MORE Act, and regional supply chain integration in BARMM.")
+    
+    tab1, tab2 = st.tabs(["PEZA / Economic Zones", "BARMM Export Gateway"])
+    
+    with tab1:
+        st.subheader("Key Investment Promotion Agencies (IPAs)")
+        ez_data = [
+            {"Zone / Authority": "PEZA (Philippine Economic Zone Authority)", "Focus": "Manufacturing, IT-BPM, Electronics Export", "Incentives": "Income Tax Holiday (ITH) + Enhanced Deductions"},
+            {"Zone / Authority": "SBMA (Subic Bay Metropolitan Authority)", "Focus": "Maritime logistics, heavy industry, warehousing", "Incentives": "Duty-free importation of capital equipment"},
+            {"Zone / Authority": "CDC (Clark Development Corporation)", "Focus": "Aviation, high-tech manufacturing, logistics", "Incentives": "Special corporate tax rate & tax exemptions"}
+        ]
+        st.dataframe(pd.DataFrame(ez_data), use_container_width=True)
         
-    if st.button("Verify RA 12066 Eligibility"):
-        passed, logs = check_create_more_eligibility(is_ree, ratio, attr)
-        for l in logs:
-            st.markdown(l)
+    with tab2:
+        st.subheader("Bangsamoro Autonomous Region in Muslim Mindanao (BARMM) Potential")
+        barmm_data = [
+            {"Sector": "Coconut & Coconut Oil", "Current Status": "High primary production", "Export Potential": "High value-added oleochemicals"},
+            {"Sector": "Halal Food Processing", "Current Status": "Growing ecosystem", "Export Potential": "Global Halal markets in ASEAN & Middle East"},
+            {"Sector": "Seaweed & Fisheries (Tuna)", "Current Status": "Major regional contributor", "Export Potential": "Cold-chain processing and direct export"}
+        ]
+        st.dataframe(pd.DataFrame(barmm_data), use_container_width=True)
 
-with tab_sources:
-    st.subheader("Data Sources, Provenance & Legal Disclaimer")
+# --- PAGE 6: ABOUT & DATA SOURCES ---
+elif nav_page == "About & Data Sources":
+    st.title("ℹ️ About the Platform & Data Sources")
     st.markdown("""
-    * **Primary Sources:** DTI Export Marketing Bureau, Tariff Commission Philippine Tariff Finder, Bureau of Customs (BOC), UN Comtrade, ASEANstats.
-    * **Data Freshness Classification:** <span class="verified-badge">VERIFIED DATA</span> | <span class="provenance-badge">INDICATIVE / MODEL ESTIMATE</span>
+    **FTA Market Access Scanner & Philippine Trade Intelligence Platform**  
+    *An independent decision-support tool designed for exporters, investors, and trade economists.*
     
-    > **Legal Disclaimer:** This platform provides independent trade intelligence and decision-support analysis. It is not an official government customs, tariff classification, or FTA certification system.
-    """, unsafe_allow_html=True)
-
-st.markdown("---")
-st.markdown("**Application Architecture:** Developed by Engr. Airsad R. Olomodin, MBA, CBE, PhD")
+    ### Authoritative Data Sources Referenced:
+    * **Philippine Statistics Authority (PSA):** National merchandise trade performance and partner statistics.
+    * **Department of Trade and Industry (DTI):** FTA schedules, Rules of Origin, and export promotion frameworks.
+    * **UN Comtrade & WITS:** International import demand, competitor market shares, and bilateral trade matrices.
+    * **Tariff Commission:** AHTN nomenclature and MFN applied tariff schedules.
+    
+    **Architect / Developer:** Engr. Airsad R. Olomodin, MBA, CBE, PhD  
+    """)
