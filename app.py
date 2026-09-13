@@ -37,7 +37,7 @@ def load_ahtn_dataset():
 ahtn_df = load_ahtn_dataset()
 
 st.sidebar.title("🇵🇭 PH Trade Intelligence")
-st.sidebar.markdown("**FTA Market Access Scanner v2.9**")
+st.sidebar.markdown("**FTA Market Access Scanner v3.0**")
 st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
@@ -72,7 +72,7 @@ if nav_selection == "Home / Executive Dashboard":
 
 elif nav_selection == "AHTN 2022 Product Scanner":
     st.title("AHTN 2022 Product & HS Code Scanner")
-    search_query = st.text_input("Search HS Code, AHTN Code, or Keyword (e.g., 'coconut', '1513'):", "")
+    search_query = st.text_input("Search HS Code, AHTN Code, or Keyword (e.g., 'coconut', '1513', 'tuna'):", "")
     
     if not ahtn_df.empty:
         if search_query:
@@ -86,38 +86,43 @@ elif nav_selection == "AHTN 2022 Product Scanner":
 
 elif nav_selection == "Market Access & Dual-API Engine":
     st.title("Market Access & Dual-API Analytics Engine")
+    
     col1, col2 = st.columns(2)
     with col1:
         hs = st.text_input("Enter 6-digit HS / AHTN Code:", "151311")
-        market = st.selectbox("Target Market:", ["Japan (392)", "South Korea (410)", "China (156)"])
+        market = st.selectbox("Target Market:", ["Japan (392)", "South Korea (410)", "China (156)", "United States (842)"])
     with col2:
         fta = st.selectbox("Select FTA:", tariff_eng.supported_ftas)
         year = st.selectbox("Trade Data Year:", ["2025", "2024", "2023"])
 
     if st.button("Execute Live Dual-API Scan", type="primary"):
-        with st.spinner("Fetching data from UN Comtrade & World Bank WITS..."):
-            partner_map = {"Japan (392)": "392", "South Korea (410)": "410", "China (156)": "156"}
+        with st.spinner("Querying UN Comtrade & WITS databases..."):
+            partner_map = {"Japan (392)": "392", "South Korea (410)": "410", "China (156)": "156", "United States (842)": "842"}
             p_code = partner_map.get(market, "392")
             
+            # Fetch live / local dynamic data
             trade_res = comtrade.fetch_trade_data("608", p_code, year, hs)
             tariff_res = tariff_eng.get_fta_tariff(hs, fta, partner=p_code[:3])
+
+        st.markdown(f"**Product Identified**: `{tariff_res['description']}`")
 
         b1, b2 = st.columns(2)
         with b1:
             st.info(f"UN Comtrade Status: **{trade_res['status']}**")
         with b2:
-            st.info(f"WITS Tariff Status: **{tariff_res['wits_api_status']}**")
+            st.info(f"WITS Tariff Engine Status: **{tariff_res['wits_api_status']}** (with AHTN Local Fallback)")
 
         m1, m2, m3 = st.columns(3)
-        m1.metric("MFN Baseline Tariff", "15.0%")
+        m1.metric("MFN Baseline Tariff", f"{tariff_res['mfn_rate']}%")
         m2.metric("FTA Preferential Rate", f"{tariff_res['preferential_rate']}%")
         m3.metric("Preference Margin", f"{tariff_res['preference_margin']}%")
-        st.success("Dual-API market access evaluation completed successfully.")
+        
+        st.success(f"Successfully evaluated market access for HS Code **{hs}** under **{fta}** to **{market}**.")
 
 elif nav_selection == "Rules of Origin Calculator":
     st.title("Rules of Origin (RVC) Calculator")
-    fob = st.number_input("FOB Export Value (USD):", value=25000.0)
-    non_orig = st.number_input("Non-Originating Material Value (USD):", value=8500.0)
+    fob = st.number_input("FOB Export Value (USD):", value=25000.0, step=1000.0)
+    non_orig = st.number_input("Non-Originating Material Value (USD):", value=8500.0, step=500.0)
     
     if st.button("Calculate RVC Qualification"):
         res = origin_eng.calculate_rvc_fob(fob, non_orig)
