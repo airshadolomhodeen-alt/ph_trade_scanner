@@ -76,9 +76,9 @@ def load_ahtn_dataset():
 
 ahtn_df = load_ahtn_dataset()
 
-# --- SIDEBAR NAVIGATION ---
+# --- SIDEBAR NAVIGATION & CREDENTIALS ---
 st.sidebar.title("🇵🇭 PH Trade Intelligence")
-st.sidebar.markdown("**National Trade Access Portal v4.1**")
+st.sidebar.markdown("**National Trade Access Portal v4.4**")
 st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
@@ -102,6 +102,14 @@ st.sidebar.markdown("🟢 **PEZA Official Portal**: Active")
 st.sidebar.markdown("🟢 **Subic Port Portal**: Active")
 st.sidebar.markdown("🟢 **ITC Trade Map**: Active")
 st.sidebar.markdown(f"🟢 **AHTN DB**: {len(ahtn_df):,} Records")
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("📌 Developer & Notice")
+st.sidebar.markdown("**Developer**: ENGR. AIRSAD R. OLOMODIN, MBA, CBE, PhD")
+st.sidebar.markdown(
+    "<small><b>Disclaimer</b>: This analytical decision-support terminal is developed strictly for the personal use of authorized policy-makers and trade officials within the Bangsamoro Autonomous Region in Muslim Mindanao (BARMM). All simulated outputs, tariff schedules, and bilateral data indices are intended exclusively for strategic guidance, exploratory scenario planning, and institutional research.</small>",
+    unsafe_allow_html=True
+)
 
 # --- APP ROUTING ---
 if nav_selection == "Home / Executive Dashboard":
