@@ -66,7 +66,6 @@ def load_ahtn_dataset():
         try:
             df = pd.read_csv(csv_path, encoding="latin1")
             df = df.dropna(subset=['ProductCode'])
-            # Clean unwanted unnamed columns
             df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
             return df
         except Exception:
@@ -77,17 +76,17 @@ ahtn_df = load_ahtn_dataset()
 
 # --- SIDEBAR NAVIGATION ---
 st.sidebar.title("🇵🇭 PH Trade Intelligence")
-st.sidebar.markdown("**National Trade Access Portal v3.8**")
+st.sidebar.markdown("**National Trade Access Portal v4.0**")
 st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
     "Navigation Menu",
     [
         "Home / Executive Dashboard",
-        "AHTN 2022 Product Scanner",
-        "Market Access & Multi-API Engine",
-        "Rules of Origin Calculator",
-        "Economic Zones, Ports & ITC",
+        "AHTN 2022 Product Nomenclature",
+        "Bilateral Market Access & Multi-API Engine",
+        "Rules of Origin (RVC) Compliance",
+        "Economic Zones, Ports & ITC Intelligence",
         "Data Sources & Provenance"
     ]
 )
@@ -105,13 +104,13 @@ st.sidebar.markdown(f"🟢 **AHTN DB**: {len(ahtn_df):,} Records")
 if nav_selection == "Home / Executive Dashboard":
     st.title("National Trade Intelligence & FTA Scanner")
     st.markdown("### Institutional Decision-Support Terminal for Philippine Exporters & Trade Attaches")
-    st.markdown("Evaluate bilateral trade flows, verify preferential tariff margins under ASEAN agreements (ATIGA, RCEP, ACFTA), and analyze special economic zones.")
+    st.markdown("Independent analytics platform evaluating preferential tariffs, bilateral trade positions for **The Philippines (PHL - ISO 608)**, and regional economic zones.")
     st.markdown("---")
     
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Nomenclature Standard", "AHTN 2022", "Official BOC Baseline")
-    c2.metric("Active Trade Pacts", "10+ FTAs", "ATIGA, RCEP, Bilateral")
-    c3.metric("Live API Providers", "5 Integrated", "Fully Synchronized")
+    c1.metric("Reporting Economy", "Philippines (PHL)", "ISO Code: 608")
+    c2.metric("Nomenclature Standard", "AHTN 2022", "Official BOC Baseline")
+    c3.metric("Covered Trade Pacts", "10+ FTAs", "ATIGA, RCEP, Bilateral")
     c4.metric("Database Integrity", f"{len(ahtn_df):,} Codes", "Optimized Search")
     
     st.markdown("<br>", unsafe_allow_html=True)
@@ -122,9 +121,9 @@ if nav_selection == "Home / Executive Dashboard":
         <div class="card-container">
             <h3>🏛️ Core Trade Capabilities</h3>
             <ul>
+                <li><b>Philippine Export Position</b>: Track Philippine bilateral trade flows against major global partners with explicit country names.</li>
                 <li><b>Dual-API Cross Verification</b>: Real-time queries matching UN Comtrade bilateral statistics with World Bank WITS tariff rates.</li>
                 <li><b>Preference Margin Analytics</b>: Instantly calculate MFN vs. Preferential FTA duty differentials.</li>
-                <li><b>Rules of Origin Verification</b>: Automated Regional Value Content (RVC) assessment for tariff code qualification.</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -141,9 +140,9 @@ if nav_selection == "Home / Executive Dashboard":
         </div>
         """, unsafe_allow_html=True)
 
-elif nav_selection == "AHTN 2022 Product Scanner":
+elif nav_selection == "AHTN 2022 Product Nomenclature":
     st.title("AHTN 2022 Product & HS Code Nomenclature")
-    st.markdown("Search official tariff classification codes, descriptions, and structural chapters.")
+    st.markdown("Search official tariff classification codes, descriptions, and structural chapters for Philippine trade compliance.")
     
     search_query = st.text_input("🔍 Search by HS Code, AHTN Code, or Keyword (e.g., 'coconut oil', '1513', 'tuna', 'semiconductors'):", "")
     
@@ -159,58 +158,70 @@ elif nav_selection == "AHTN 2022 Product Scanner":
     else:
         st.error("`ahtn_2022_master.csv` not found in root directory.")
 
-elif nav_selection == "Market Access & Multi-API Engine":
-    st.title("Market Access & Multi-API Analytics Engine")
-    st.markdown("Cross-examine bilateral trade flows and calculate preferential tariff advantages across target export destinations.")
+elif nav_selection == "Bilateral Market Access & Multi-API Engine":
+    st.title("Bilateral Market Access & Multi-API Analytics Engine")
+    st.markdown("Evaluate bilateral trade flows originating from **The Philippines (PHL - 608)** to key partner markets under specific Free Trade Agreements.")
     
     with st.container():
         st.markdown('<div class="card-container">', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
             hs = st.text_input("Enter 6-digit HS / AHTN Code:", "151311")
-            market = st.selectbox("Target Export Market:", ["Japan (392)", "South Korea (410)", "China (156)", "United States (842)"])
+            market = st.selectbox(
+                "Target Export Partner Market:", 
+                [
+                    "Japan (JPN - 392)", 
+                    "South Korea (KOR - 410)", 
+                    "China (CHN - 156)", 
+                    "United States (USA - 842)",
+                    "Thailand (THA - 764)",
+                    "Vietnam (VNM - 704)",
+                    "Singapore (SGP - 702)",
+                    "Malaysia (MYS - 458)",
+                    "Indonesia (IDN - 360)"
+                ]
+            )
         with col2:
             fta = st.selectbox("Select Preferential Trade Agreement:", tariff_eng.supported_ftas)
             year = st.selectbox("Trade Statistical Year:", ["2025", "2024", "2023"])
 
-        scan_btn = st.button("🚀 Execute Live Multi-API Terminal Scan", type="primary", use_container_width=True)
+        scan_btn = st.button("🚀 Execute Live Bilateral Multi-API Scan", type="primary", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     if scan_btn:
-        with st.spinner("Connecting to UN Comtrade, WITS tariff databases, and calculating preferences..."):
-            partner_map = {"Japan (392)": "392", "South Korea (410)": "410", "China (156)": "156", "United States (842)": "842"}
-            p_code = partner_map.get(market, "392")
-            
+        with st.spinner("Querying UN Comtrade (PHL exports), WITS tariff databases, and calculating preference margins..."):
+            p_code = market.split("(")[1].split("-")[1].strip().replace(")", "")
             trade_res = comtrade.fetch_trade_data("608", p_code, year, hs)
-            tariff_res = tariff_eng.get_fta_tariff(hs, fta, partner=p_code[:3])
+            tariff_res = tariff_eng.get_fta_tariff(hs, fta, partner=p_code)
 
-        st.markdown(f"### Diagnostic Results for HS `{hs}`")
-        st.info(f"**Official Description Reference**: {tariff_res['description']}")
+        st.markdown(f"### Bilateral Trade & Tariff Assessment")
+        st.markdown(f"**Exporting Country**: 🇵🇭 Philippines (608)  |  **Partner Market**: {market}")
+        st.info(f"**Product Nomenclature Description**: {tariff_res['description']}")
 
         b1, b2 = st.columns(2)
         with b1:
-            st.success(f"**UN Comtrade Gateway**: {trade_res['status']}")
+            st.success(f"**UN Comtrade Gateway Status**: {trade_res['status']}")
         with b2:
-            st.success(f"**WITS Tariff Engine**: {tariff_res['wits_api_status']}")
+            st.success(f"**WITS Tariff Engine Status**: {tariff_res['wits_api_status']}")
 
         m1, m2, m3 = st.columns(3)
         m1.metric("MFN Baseline Tariff", f"{tariff_res['mfn_rate']}%", "Standard Rate")
         m2.metric("FTA Preferential Rate", f"{tariff_res['preferential_rate']}%", f"Under {fta}")
         m3.metric("Preference Margin", f"{tariff_res['preference_margin']}%", "Duty Savings Advantage")
 
-elif nav_selection == "Rules of Origin Calculator":
+elif nav_selection == "Rules of Origin (RVC) Compliance":
     st.title("Rules of Origin (RVC) Compliance Engine")
-    st.markdown("Verify Regional Value Content (RVC) thresholds required for preferential tariff qualification under ASEAN agreements.")
+    st.markdown("Verify Regional Value Content (RVC) thresholds required for Philippine products to qualify for preferential tariffs under ASEAN agreements.")
     
     with st.container():
         st.markdown('<div class="card-container">', unsafe_allow_html=True)
         col_in1, col_in2 = st.columns(2)
         with col_in1:
-            fob = st.number_input("FOB Export Value (USD):", value=25000.0, step=1000.0, format="%.2f")
+            fob = st.number_input("Philippine FOB Export Value (USD):", value=25000.0, step=1000.0, format="%.2f")
         with col_in2:
             non_orig = st.number_input("Value of Non-Originating Materials (CIF USD):", value=8500.0, step=500.0, format="%.2f")
             
-        calc_btn = st.button("⚖️ Run RVC Qualification Audit", type="primary", use_container_width=True)
+        calc_btn = st.button("⚖️ Run Philippine RVC Qualification Audit", type="primary", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     if calc_btn:
@@ -225,11 +236,11 @@ elif nav_selection == "Rules of Origin Calculator":
             st.progress(min(max(float(rvc_val) / 100.0, 0.0), 1.0))
             
         if res['passed']:
-            st.success("✅ **STATUS: FULLY QUALIFIED** — The product meets standard Regional Value Content criteria for preferential tariff treatment.")
+            st.success("✅ **STATUS: FULLY QUALIFIED** — The product meets standard Regional Value Content criteria for preferential tariff treatment under Philippine FTA frameworks.")
         else:
-            st.warning("⚠️ **STATUS: NON-QUALIFIED** — Regional value content falls below the required threshold. Consider sourcing local component materials.")
+            st.warning("⚠️ **STATUS: NON-QUALIFIED** — Regional value content falls below the required threshold. Consider sourcing local component materials within the Philippines or ASEAN.")
 
-elif nav_selection == "Economic Zones, Ports & ITC":
+elif nav_selection == "Economic Zones, Ports & ITC Intelligence":
     st.title("Economic Zones, Ports & Global Trade Intelligence")
     st.markdown("Direct institutional access to Philippine investment zones, port logistics, and international trade analytics.")
     
@@ -241,7 +252,7 @@ elif nav_selection == "Economic Zones, Ports & ITC":
         st.markdown("🔗 [Open Official PEZA Portal](https://www.peza.gov.ph)")
         if st.button("Query PEZA Portal Status", type="primary"):
             with st.spinner("Verifying PEZA gateway connectivity..."):
-                peza_res =peza.fetch_peza_resources()
+                peza_res = peza.fetch_peza_resources()
             if peza_res["status"] == "VERIFIED":
                 st.success("PEZA Portal connection verified successfully!")
                 for idx, item in enumerate(peza_res["data"], 1):
@@ -292,7 +303,7 @@ elif nav_selection == "Data Sources & Provenance":
     st.markdown("""
     <div class="card-container">
         <ul>
-            <li><b>UN Comtrade API v1</b>: Official bilateral trade statistics and partner trade matrices.</li>
+            <li><b>UN Comtrade API v1</b>: Official bilateral trade statistics (Reporting Economy: Philippines - 608).</li>
             <li><b>World Bank WITS SDMX API</b>: Preferential and Most-Favored-Nation (MFN) tariff schedules.</li>
             <li><b>PEZA Official Portal</b>: Philippine Economic Zone Authority policies, ecozone directories, and incentives.</li>
             <li><b>Subic Bay Port Portal</b>: Freeport shipping intelligence, vessel schedules, and terminal capacity.</li>
