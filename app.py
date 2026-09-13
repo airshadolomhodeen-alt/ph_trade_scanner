@@ -11,6 +11,7 @@ from providers.itc_provider import ItcProvider
 from tariff_engine import TariffEngine
 from fta_analyzer import FTAEngine
 from trade_stats import OriginEngine, OpportunityEngine
+from trade_analytics_matrix import TradeAnalyticsMatrix
 
 st.set_page_config(
     page_title="PH Trade Intelligence | National FTA & Market Access Terminal",
@@ -58,6 +59,7 @@ tariff_eng = TariffEngine()
 fta_eng = FTAEngine()
 origin_eng = OriginEngine()
 opp_eng = OpportunityEngine()
+matrix_eng = TradeAnalyticsMatrix()
 
 @st.cache_data
 def load_ahtn_dataset():
@@ -76,13 +78,14 @@ ahtn_df = load_ahtn_dataset()
 
 # --- SIDEBAR NAVIGATION ---
 st.sidebar.title("🇵🇭 PH Trade Intelligence")
-st.sidebar.markdown("**National Trade Access Portal v4.0**")
+st.sidebar.markdown("**National Trade Access Portal v4.1**")
 st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
     "Navigation Menu",
     [
         "Home / Executive Dashboard",
+        "Top 20 Country Destinations & Matrices",
         "AHTN 2022 Product Nomenclature",
         "Bilateral Market Access & Multi-API Engine",
         "Rules of Origin (RVC) Compliance",
@@ -121,7 +124,7 @@ if nav_selection == "Home / Executive Dashboard":
         <div class="card-container">
             <h3>🏛️ Core Trade Capabilities</h3>
             <ul>
-                <li><b>Philippine Export Position</b>: Track Philippine bilateral trade flows against major global partners with explicit country names.</li>
+                <li><b>Top 20 Trade Matrices</b>: Complete PSA/WITS tracking of top export and import country channels.</li>
                 <li><b>Dual-API Cross Verification</b>: Real-time queries matching UN Comtrade bilateral statistics with World Bank WITS tariff rates.</li>
                 <li><b>Preference Margin Analytics</b>: Instantly calculate MFN vs. Preferential FTA duty differentials.</li>
             </ul>
@@ -139,6 +142,33 @@ if nav_selection == "Home / Executive Dashboard":
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
+elif nav_selection == "Top 20 Country Destinations & Matrices":
+    st.title("Philippine Macroeconomic Top 20 Trade Matrices")
+    st.markdown("Comprehensive statistical breakdown of the Philippines' Top 20 export markets and import origins based on official PSA and WITS trade records.")
+    st.markdown("---")
+    
+    tab_exp, tab_imp = st.tabs(["🇺🇸 Top 20 Export Destinations", "🇨🇳 Top 20 Import Origins"])
+    
+    with tab_exp:
+        st.subheader("Philippine Top 20 Export Partner Markets")
+        st.dataframe(matrix_eng.get_export_df(), use_container_width=True, height=600, hide_index=True)
+        
+    with tab_imp:
+        st.subheader("Philippine Top 20 Import Origin Markets")
+        st.dataframe(matrix_eng.get_import_df(), use_container_width=True, height=600, hide_index=True)
+        
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="card-container">
+        <h3>📋 Strategic Summary for Trade Officials</h3>
+        <ul>
+            <li><b>Regional Focus</b>: East Asia and ASEAN account for the bulk of high-volume trade transactions.</li>
+            <li><b>Rules of Origin (RVC)</b>: Preferential tariff utilization under ATIGA or RCEP requires verifying that non-originating materials do not breach the standard <b><= 60% allowance (>= 40% RVC threshold)</b>.</li>
+            <li><b>Strategic Diversification</b>: Expanding market access into Europe (Germany, Netherlands) and South Asia remains a key priority for Philippine export promotion programs.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
 elif nav_selection == "AHTN 2022 Product Nomenclature":
     st.title("AHTN 2022 Product & HS Code Nomenclature")
@@ -170,14 +200,18 @@ elif nav_selection == "Bilateral Market Access & Multi-API Engine":
             market = st.selectbox(
                 "Target Export Partner Market:", 
                 [
-                    "Japan (JPN - 392)", 
-                    "South Korea (KOR - 410)", 
-                    "China (CHN - 156)", 
                     "United States (USA - 842)",
-                    "Thailand (THA - 764)",
-                    "Vietnam (VNM - 704)",
+                    "Japan (JPN - 392)", 
+                    "Mainland China (CHN - 156)",
+                    "Hong Kong (HKG - 344)",
                     "Singapore (SGP - 702)",
+                    "Thailand (THA - 764)",
+                    "Germany (DEU - 276)",
+                    "South Korea (KOR - 410)", 
+                    "Netherlands (NLD - 528)",
                     "Malaysia (MYS - 458)",
+                    "Taiwan (TWN - 158)",
+                    "Vietnam (VNM - 704)",
                     "Indonesia (IDN - 360)"
                 ]
             )
@@ -303,6 +337,7 @@ elif nav_selection == "Data Sources & Provenance":
     st.markdown("""
     <div class="card-container">
         <ul>
+            <li><b>Philippine Statistics Authority (PSA)</b>: Official macroeconomic trade matrices, Top 20 trade country shares, and national trade balances.</li>
             <li><b>UN Comtrade API v1</b>: Official bilateral trade statistics (Reporting Economy: Philippines - 608).</li>
             <li><b>World Bank WITS SDMX API</b>: Preferential and Most-Favored-Nation (MFN) tariff schedules.</li>
             <li><b>PEZA Official Portal</b>: Philippine Economic Zone Authority policies, ecozone directories, and incentives.</li>
