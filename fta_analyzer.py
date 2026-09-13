@@ -1,14 +1,14 @@
 def analyze_market_potential(est_val, tariff_adv, logistics_val):
-    """Calculates an export market potential index score based on gravity model metrics with transparent provenance."""
+    """Calculates an export market potential index score based on gravity model metrics."""
     score = (est_val * 0.05) + (tariff_adv * 3.5) + (logistics_val * 40.0)
     score = min(max(round(score, 1), 12.5), 98.5)
     
     if score >= 75:
-        tier = "Tier 1: High Priority Export Growth Market (Immediate Strategy Focus)"
+        tier = "Tier 1: High Priority Export Growth Market"
     elif score >= 50:
-        tier = "Tier 2: Moderate Potential Market (Requires Targeted NTM/SPS Mitigation)"
+        tier = "Tier 2: Moderate Potential Market"
     else:
-        tier = "Tier 3: Niche or Emerging Market (Long-term Market Development)"
+        tier = "Tier 3: Niche / Emerging Market"
         
     return score, tier
 
@@ -18,56 +18,114 @@ def check_create_more_eligibility(is_ree, export_ratio, directly_attributable):
     passed = True
     
     if is_ree:
-        logs.append("✅ **Registered Export Enterprise (REE) Status:** Confirmed under RA 12066.")
+        logs.append("✅ **REE Status:** Confirmed under RA 12066.")
     else:
         passed = False
-        logs.append("❌ **Registered Export Enterprise (REE) Status:** Non-compliant. Must hold REE registration.")
+        logs.append("❌ **REE Status:** Non-compliant. Must hold REE registration.")
         
     if export_ratio >= 70.0:
-        logs.append(f"✅ **Export Sales Ratio ({export_ratio}%):** Meets statutory export threshold (>70%).")
+        logs.append(f"✅ **Export Ratio ({export_ratio}%):** Meets statutory threshold (>70%).")
     else:
         passed = False
-        logs.append(f"❌ **Export Sales Ratio ({export_ratio}%):** Below mandatory 70% threshold.")
+        logs.append(f"❌ **Export Ratio ({export_ratio}%):** Below mandatory 70% threshold.")
         
     if directly_attributable:
-        logs.append("✅ **Directly Attributable Input Criterion:** Verified for VAT zero-rating & duty-free privileges.")
+        logs.append("✅ **Direct Input Criterion:** Verified for VAT zero-rating.")
     else:
         passed = False
-        logs.append("❌ **Directly Attributable Input Criterion:** Unverified.")
+        logs.append("❌ **Direct Input Criterion:** Unverified.")
         
     return passed, logs
 
 def get_ph_fta_database():
-    """Returns official structured Philippine Free Trade Agreements inventory with source provenance."""
+    """Returns the complete inventory of Philippine Free Trade Agreements formatted for screen fit."""
     return [
         {
-            "FTA Code": "ATIGA",
+            "Code": "ATIGA",
             "Agreement Name": "ASEAN Trade in Goods Agreement",
-            "Parties": "Brunei, Cambodia, Indonesia, Laos, Malaysia, Myanmar, Philippines, Singapore, Thailand, Vietnam",
-            "Effective Date": "2010 (Upgraded)",
+            "Partners": "ASEAN (10 Member States)",
             "Status": "ACTIVE",
-            "Tariff Schedule": "0% Preferential across 99% of tariff lines",
-            "Rules of Origin": "Wholly Obtained or RVC 40% / CTH",
-            "Data Status": "VERIFIED (DTI-EMB / ASEAN Trade Repository)"
+            "Tariff Concession": "0% across ~99% tariff lines",
+            "Provenance": "DTI-EMB / ASEAN Repository"
         },
         {
-            "FTA Code": "RCEP",
-            "Agreement Name": "Regional Comprehensive Economic Partnership",
-            "Parties": "ASEAN, Australia, China, Japan, South Korea, New Zealand",
-            "Effective Date": "June 2023 (Philippines)",
+            "Code": "RCEP",
+            "Agreement Name": "Regional Comprehensive Econ. Partnership",
+            "Partners": "ASEAN, CN, JP, KR, AU, NZ",
             "Status": "ACTIVE",
-            "Tariff Schedule": "Phased elimination / Concession schedules",
-            "Rules of Origin": "Cumulation across RCEP signatories; RVC 40% or PSR",
-            "Data Status": "VERIFIED (Tariff Commission)"
+            "Tariff Concession": "Phased elimination schedules",
+            "Provenance": "Tariff Commission"
         },
         {
-            "FTA Code": "PJEPA",
-            "Agreement Name": "Philippines-Japan Economic Partnership Agreement",
-            "Parties": "Philippines, Japan",
-            "Effective Date": "December 2008",
+            "Code": "PH-KR",
+            "Agreement Name": "Philippines–Korea Free Trade Agreement",
+            "Partners": "Philippines, South Korea",
             "Status": "ACTIVE",
-            "Tariff Schedule": "Bilateral reciprocal concessions",
-            "Rules of Origin": "Product-Specific Rules (PSR) / CTC / RVC",
-            "Data Status": "VERIFIED (DTI-EMB)"
+            "Tariff Concession": "Elimination of duties on agri/industrial",
+            "Provenance": "DTI / EO 80"
+        },
+        {
+            "Code": "PJEPA",
+            "Agreement Name": "PH-Japan Economic Partnership Agreement",
+            "Partners": "Philippines, Japan",
+            "Status": "ACTIVE",
+            "Tariff Concession": "Bilateral tariff eliminations (>90%)",
+            "Provenance": "DTI-EMB"
+        },
+        {
+            "Code": "PH-EFTA",
+            "Agreement Name": "PH–European Free Trade Association FTA",
+            "Partners": "CH, NO, IS, LI",
+            "Status": "ACTIVE",
+            "Tariff Concession": "Duty-free industrial/fisheries",
+            "Provenance": "DTI-EMB"
+        },
+        {
+            "Code": "ACFTA",
+            "Agreement Name": "ASEAN–China Free Trade Area",
+            "Partners": "ASEAN, China",
+            "Status": "ACTIVE",
+            "Tariff Concession": "Normal Track 0% tariff",
+            "Provenance": "Tariff Commission"
+        },
+        {
+            "Code": "AKFTA",
+            "Agreement Name": "ASEAN–Korea Free Trade Area",
+            "Partners": "ASEAN, South Korea",
+            "Status": "ACTIVE",
+            "Tariff Concession": "Progressive tariff reduction",
+            "Provenance": "DTI-EMB"
+        },
+        {
+            "Code": "AANZFTA",
+            "Agreement Name": "ASEAN–Australia–New Zealand FTA",
+            "Partners": "ASEAN, Australia, New Zealand",
+            "Status": "ACTIVE",
+            "Tariff Concession": "Comprehensive elimination (>90%)",
+            "Provenance": "Tariff Commission"
+        },
+        {
+            "Code": "AIFTA",
+            "Agreement Name": "ASEAN–India Free Trade Area",
+            "Partners": "ASEAN, India",
+            "Status": "ACTIVE",
+            "Tariff Concession": "Gradual tariff concessions",
+            "Provenance": "DTI-EMB"
+        },
+        {
+            "Code": "AJCEPA",
+            "Agreement Name": "ASEAN–Japan Comprehensive Partnership",
+            "Partners": "ASEAN, Japan",
+            "Status": "ACTIVE",
+            "Tariff Concession": "Regional tariff reductions",
+            "Provenance": "Tariff Commission"
+        },
+        {
+            "Code": "AHKFTA",
+            "Agreement Name": "ASEAN–Hong Kong, China FTA",
+            "Partners": "ASEAN, Hong Kong SAR",
+            "Status": "ACTIVE",
+            "Tariff Concession": "Preferential commitments",
+            "Provenance": "DTI-EMB"
         }
     ]
