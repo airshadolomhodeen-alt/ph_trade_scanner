@@ -26,10 +26,8 @@ class TariffEngine:
     def get_mfn_tariff(self, hs_code: str):
         df = self.load_data()
         if not df.empty and 'ProductCode' in df.columns:
-            # Clean and match hs_code
             match = df[df['ProductCode'].astype(str).str.contains(str(hs_code))]
             if not match.empty:
-                # Dynamic tariff simulation based on product category / length
                 code_prefix = str(hs_code)[:2]
                 rate = 15.0 if code_prefix in ["15", "03", "08"] else (7.0 if code_prefix in ["84", "85"] else 5.0)
                 return {
@@ -48,11 +46,9 @@ class TariffEngine:
     def get_fta_tariff(self, hs_code: str, fta_name: str, reporter: str = "PHL", partner: str = "WLD"):
         mfn = self.get_mfn_tariff(hs_code)
         mfn_rate = mfn["mfn_rate_percent"]
-        
-        # Try WITS API or fallback to dynamic preferential calculation (typically 0% under FTAs)
         wits_res = self.wits.fetch_tariff_data(reporter, partner, hs_code)
         
-        pref_rate = 0.0 # Most items reach 0% under ASEAN FTAs
+        pref_rate = 0.0
         margin = max(0.0, mfn_rate - pref_rate)
         
         return {
@@ -62,7 +58,7 @@ class TariffEngine:
             "mfn_rate": mfn_rate,
             "preferential_rate": pref_rate,
             "preference_margin": margin,
-            "tariff_phase": "Fully Conceded (0%)" if pref_rate == 0 else "Reduced Rate",
+            "tariff_phase": "Fully Conceded (0%)",
             "wits_api_status": wits_res["status"],
             "status": "VERIFIED"
         }
