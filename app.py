@@ -7,6 +7,7 @@ from providers.wits_provider import WitsProvider
 from providers.peza_provider import PezaProvider
 from providers.subic_port_provider import SubicPortProvider
 from providers.itc_provider import ItcProvider
+from providers.datadocked_provider import DataDockedProvider
 
 from tariff_engine import TariffEngine
 from fta_analyzer import FTAEngine
@@ -54,6 +55,7 @@ wits = WitsProvider()
 peza = PezaProvider()
 subic_port = SubicPortProvider()
 itc_prov = ItcProvider()
+datadocked = DataDockedProvider()
 
 tariff_eng = TariffEngine()
 fta_eng = FTAEngine()
@@ -78,7 +80,7 @@ ahtn_df = load_ahtn_dataset()
 
 # --- SIDEBAR NAVIGATION & CREDENTIALS ---
 st.sidebar.title("🇵🇭 PH Trade Intelligence")
-st.sidebar.markdown("**National Trade Access Portal v4.4**")
+st.sidebar.markdown("**National Trade Access Portal v4.5**")
 st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
@@ -90,6 +92,7 @@ nav_selection = st.sidebar.radio(
         "Bilateral Market Access & Multi-API Engine",
         "Rules of Origin (RVC) Compliance",
         "Economic Zones, Ports & ITC Intelligence",
+        "Maritime & Vessel Traffic Intelligence",
         "Data Sources & Provenance"
     ]
 )
@@ -101,6 +104,7 @@ st.sidebar.markdown("🟢 **World Bank WITS**: Active")
 st.sidebar.markdown("🟢 **PEZA Official Portal**: Active")
 st.sidebar.markdown("🟢 **Subic Port Portal**: Active")
 st.sidebar.markdown("🟢 **ITC Trade Map**: Active")
+st.sidebar.markdown("🟢 **Data Docked Maritime API**: Active")
 st.sidebar.markdown(f"🟢 **AHTN DB**: {len(ahtn_df):,} Records")
 
 st.sidebar.markdown("---")
@@ -337,6 +341,32 @@ elif nav_selection == "Economic Zones, Ports & ITC Intelligence":
             else:
                 st.info("Live feed protected by institutional firewall. Use direct portal links above for secure browsing.")
 
+elif nav_selection == "Maritime & Vessel Traffic Intelligence":
+    st.title("Maritime Logistics & Vessel Traffic Intelligence")
+    st.markdown("Real-time tracking of cargo vessels, shipping lanes, and port congestion relevant to international trade corridors in BARMM and the wider Philippines.")
+    st.markdown("---")
+
+    if st.button("🚢 Scan Live Maritime Traffic (Data Docked)", type="primary"):
+        with st.spinner("Fetching live vessel positions and port tracking from Data Docked..."):
+            maritime_res = datadocked.fetch_vessel_traffic()
+            
+        if maritime_res["status"] == "VERIFIED":
+            st.success("Maritime intelligence feed synchronized successfully!")
+            vessel_df = pd.DataFrame(maritime_res["data"])
+            st.dataframe(vessel_df, use_container_width=True, hide_index=True)
+        else:
+            st.error("Failed to retrieve live maritime streams. Please check API quota or documentation.")
+            
+    st.markdown("""
+    <div class="card-container">
+        <h3>💡 Strategic Relevance to Trade Policy</h3>
+        <ul>
+            <li><b>Supply Chain Visibility</b>: Real-time tracking of cargo movements provides critical insights into shipping delays and transit bottlenecks affecting regional exports.</li>
+            <li><b>Port Integration</b>: Complements existing port portals (such as Subic Bay and PEZA zones) by linking trade value with physical maritime transport logistics.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
 elif nav_selection == "Data Sources & Provenance":
     st.title("Data Sources & Institutional Provenance")
     st.markdown("Transparent documentation of all integrated trade databases and official government APIs.")
@@ -350,6 +380,7 @@ elif nav_selection == "Data Sources & Provenance":
             <li><b>World Bank WITS SDMX API</b>: Preferential and Most-Favored-Nation (MFN) tariff schedules.</li>
             <li><b>PEZA Official Portal</b>: Philippine Economic Zone Authority policies, ecozone directories, and incentives.</li>
             <li><b>Subic Bay Port Portal</b>: Freeport shipping intelligence, vessel schedules, and terminal capacity.</li>
+            <li><b>Data Docked API</b>: Real-time maritime tracking, vessel movements, and shipping route intelligence.</li>
             <li><b>International Trade Centre (ITC)</b>: Global trade maps, export potential indicators, and market access rules.</li>
             <li><b>AHTN 2022 Master Database</b>: Local nomenclature reference ensuring zero-downtime tariff calculations.</li>
         </ul>
