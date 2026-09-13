@@ -7,5 +7,5 @@ class FTAEngine:
             "fta": fta_name,
             "sector": sector,
             "compliance_feasibility": "High",
-            "notes": "Eligible for preferential treatment subject to Rules of Origin compliance under dual-API verification."
+            "notes": "Eligible for preferential treatment under multi-provider trade verification."
         }
