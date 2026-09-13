@@ -6,7 +6,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class ItcProvider:
     def __init__(self):
-        # International Trade Centre Market Analysis tools / main entry
         self.url = "https://www.intracen.org/resources/data-and-analysis/trade-statistics"
         
     def fetch_itc_intelligence(self):
