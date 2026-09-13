@@ -5,6 +5,8 @@ import os
 from providers.comtrade_provider import ComtradeProvider
 from providers.wits_provider import WitsProvider
 from providers.peza_provider import PezaProvider
+from providers.subic_port_provider import SubicPortProvider
+
 from tariff_engine import TariffEngine
 from fta_analyzer import FTAEngine
 from trade_stats import OriginEngine, OpportunityEngine
@@ -19,6 +21,8 @@ st.set_page_config(
 comtrade = ComtradeProvider()
 wits = WitsProvider()
 peza = PezaProvider()
+subic_port = SubicPortProvider()
+
 tariff_eng = TariffEngine()
 fta_eng = FTAEngine()
 origin_eng = OriginEngine()
@@ -39,7 +43,7 @@ def load_ahtn_dataset():
 ahtn_df = load_ahtn_dataset()
 
 st.sidebar.title("🇵🇭 PH Trade Intelligence")
-st.sidebar.markdown("**FTA Market Access Scanner v3.1**")
+st.sidebar.markdown("**FTA Market Access Scanner v3.2**")
 st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
@@ -59,6 +63,7 @@ st.sidebar.subheader("🔌 API & Data Status")
 st.sidebar.markdown("🟢 **UN Comtrade API v1**: Active")
 st.sidebar.markdown("🟢 **World Bank WITS SDMX**: Active")
 st.sidebar.markdown("🟢 **PEZA Downloads Portal**: Active")
+st.sidebar.markdown("🟢 **Subic Port Portal**: Active")
 st.sidebar.markdown(f"🟢 **AHTN Database**: Loaded ({len(ahtn_df)} rows)")
 
 if nav_selection == "Home / Executive Dashboard":
@@ -70,8 +75,8 @@ if nav_selection == "Home / Executive Dashboard":
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Nomenclature", "AHTN 2022")
     c2.metric("Supported FTAs", "10+ Agreements")
-    c3.metric("Live APIs", "3 Providers")
-    c4.metric("Economic Zones", "PEZA & BEZA")
+    c3.metric("Live APIs", "4 Providers")
+    c4.metric("Economic Zones", "PEZA & Subic Freeport")
 
 elif nav_selection == "AHTN 2022 Product Scanner":
     st.title("AHTN 2022 Product & HS Code Scanner")
@@ -135,28 +140,40 @@ elif nav_selection == "Rules of Origin Calculator":
             st.warning("⚠️ Below threshold requirements.")
 
 elif nav_selection == "Economic Zones & BARMM":
-    st.title("Philippine Economic Zones & BARMM Intelligence")
-    st.markdown("Access official PEZA directories, ecozone incentive updates under CREATE MORE, and BARMM trade policies.")
+    st.title("Philippine Economic Zones, Ports & BARMM Intelligence")
+    st.markdown("Access official PEZA directories, Subic Bay port specifications, and trade policy updates.")
     
-    st.markdown("---")
-    st.subheader("🌐 Live PEZA Portal Integration")
-    st.markdown("Direct repository source: [PEZA Official Downloads Portal](https://www.peza.gov.ph/downloads?combine=list+of+peza&field_sub_category_downloads_tid=All)")
+    tab1, tab2 = st.tabs(["🌐 PEZA Portal Integration", "🚢 Subic Bay Port Intelligence"])
     
-    if st.button("Fetch Live PEZA Directory & Documents", type="primary"):
-        with st.spinner("Connecting to PEZA portal servers..."):
-            peza_res = peza.fetch_peza_resources()
-            
-        if peza_res["status"] == "VERIFIED":
-            st.success("Successfully connected to PEZA portal via PezaProvider!")
-            items = peza_res["data"]
-            if items:
-                for idx, item in enumerate(items, 1):
+    with tab1:
+        st.subheader("PEZA Downloads Repository")
+        st.markdown("Direct repository source: [PEZA Official Downloads Portal](https://www.peza.gov.ph/downloads?combine=list+of+peza&field_sub_category_downloads_tid=All)")
+        if st.button("Fetch Live PEZA Directory", type="primary"):
+            with st.spinner("Connecting to PEZA portal..."):
+                peza_res = peza.fetch_peza_resources()
+            if peza_res["status"] == "VERIFIED":
+                st.success("Successfully connected to PEZA portal!")
+                for idx, item in enumerate(peza_res["data"], 1):
                     st.markdown(f"{idx}. [{item['title']}]({item['url']})")
             else:
-                st.info("Connection established, but no direct matching file rows were parsed.")
-        else:
-            st.warning(f"Could not automatically parse page elements ({peza_res.get('message', 'Timeout')}). Please use the direct link above.")
+                st.warning("Could not automatically parse items due to firewall rules. Please use the direct link above.")
+
+    with tab2:
+        st.subheader("Subic Bay Freeport & Port Capabilities")
+        st.markdown("Direct portal source: [Subic Bay Port Website](https://ship.mysubicbay.com.ph/ship-my-subic-bay)")
+        if st.button("Fetch Live Subic Port Overview", type="primary"):
+            with st.spinner("Connecting to Subic Bay port portal..."):
+                subic_res = subic_port.fetch_subic_port_info()
+            if subic_res["status"] == "VERIFIED":
+                st.success("Successfully retrieved Subic Bay port profile!")
+                st.markdown(f"**Portal Title**: {subic_res['title']}")
+                st.markdown("### Port Highlights & Features:")
+                for highlight in subic_res["highlights"][:5]:
+                    st.markdown(f"* {highlight}")
+                st.markdown(f"🔗 [Open Full Subic Bay Port Portal]({subic_res['url']})")
+            else:
+                st.warning(f"Could not load live summary ({subic_res.get('message', 'Timeout')}). Access directly via the link above.")
 
 elif nav_selection == "Data Sources & Provenance":
     st.title("Data Sources & Provenance")
-    st.markdown("All datasets are sourced directly from UN Comtrade API, World Bank WITS API, PEZA Portal, ASEAN Secretariat, and Philippine Tariff Commission.")
+    st.markdown("All datasets are sourced directly from UN Comtrade API, World Bank WITS API, PEZA Portal, Subic Bay Port Portal, ASEAN Secretariat, and Philippine Tariff Commission.")
