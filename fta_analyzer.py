@@ -1,80 +1,73 @@
+def analyze_market_potential(est_val, tariff_adv, logistics_val):
+    """Calculates an export market potential index score based on gravity model metrics with transparent provenance."""
+    score = (est_val * 0.05) + (tariff_adv * 3.5) + (logistics_val * 40.0)
+    score = min(max(round(score, 1), 12.5), 98.5)
+    
+    if score >= 75:
+        tier = "Tier 1: High Priority Export Growth Market (Immediate Strategy Focus)"
+    elif score >= 50:
+        tier = "Tier 2: Moderate Potential Market (Requires Targeted NTM/SPS Mitigation)"
+    else:
+        tier = "Tier 3: Niche or Emerging Market (Long-term Market Development)"
+        
+    return score, tier
+
+def check_create_more_eligibility(is_ree, export_ratio, directly_attributable):
+    """Validates enterprise tax and duty incentive eligibility under the CREATE MORE Act (RA 12066)."""
+    logs = []
+    passed = True
+    
+    if is_ree:
+        logs.append("✅ **Registered Export Enterprise (REE) Status:** Confirmed under RA 12066.")
+    else:
+        passed = False
+        logs.append("❌ **Registered Export Enterprise (REE) Status:** Non-compliant. Must hold REE registration.")
+        
+    if export_ratio >= 70.0:
+        logs.append(f"✅ **Export Sales Ratio ({export_ratio}%):** Meets statutory export threshold (>70%).")
+    else:
+        passed = False
+        logs.append(f"❌ **Export Sales Ratio ({export_ratio}%):** Below mandatory 70% threshold.")
+        
+    if directly_attributable:
+        logs.append("✅ **Directly Attributable Input Criterion:** Verified for VAT zero-rating & duty-free privileges.")
+    else:
+        passed = False
+        logs.append("❌ **Directly Attributable Input Criterion:** Unverified.")
+        
+    return passed, logs
+
 def get_ph_fta_database():
+    """Returns official structured Philippine Free Trade Agreements inventory with source provenance."""
     return [
         {
             "FTA Code": "ATIGA",
             "Agreement Name": "ASEAN Trade in Goods Agreement",
-            "Partner Markets": "Brunei, Cambodia, Indonesia, Laos, Malaysia, Myanmar, Singapore, Thailand, Vietnam",
-            "Key Products": "Electronics, Automotive Parts, Agricultural Goods, Processed Foods",
-            "Tariff Advantage": "0% Preferential Duty on 99%+ tariff lines",
-            "Strategic Value": "Backbone of regional supply chains and intra-ASEAN sourcing."
-        },
-        {
-            "FTA Code": "ACFTA",
-            "Agreement Name": "ASEAN-China Free Trade Area",
-            "Partner Markets": "Mainland China & ASEAN Member States",
-            "Key Products": "Machinery, Raw Chemical Inputs, Fruits (Bananas, Pineapples), Minerals",
-            "Tariff Advantage": "Elimination of tariffs on over 90% of traded goods",
-            "Strategic Value": "Primary gateway for intermediate electronics and agricultural export volume."
-        },
-        {
-            "FTA Code": "PJEPA",
-            "Agreement Name": "Philippines-Japan Economic Partnership Agreement",
-            "Partner Markets": "Japan",
-            "Key Products": "Ignition Wiring Sets, Electronic Microassemblies, Fresh Bananas, Tuna",
-            "Tariff Advantage": "Duty-free entry for key Philippine agricultural and manufacturing lines",
-            "Strategic Value": "Bilateral depth for high-value manufacturing and automotive components."
+            "Parties": "Brunei, Cambodia, Indonesia, Laos, Malaysia, Myanmar, Philippines, Singapore, Thailand, Vietnam",
+            "Effective Date": "2010 (Upgraded)",
+            "Status": "ACTIVE",
+            "Tariff Schedule": "0% Preferential across 99% of tariff lines",
+            "Rules of Origin": "Wholly Obtained or RVC 40% / CTH",
+            "Data Status": "VERIFIED (DTI-EMB / ASEAN Trade Repository)"
         },
         {
             "FTA Code": "RCEP",
             "Agreement Name": "Regional Comprehensive Economic Partnership",
-            "Partner Markets": "ASEAN + China, Japan, South Korea, Australia, New Zealand",
-            "Key Products": "All major industrial sectors, processed agricultural products, services",
-            "Tariff Advantage": "Unified Rules of Origin (ROO) and progressive tariff phase-outs",
-            "Strategic Value": "Expanded cumulation rules simplifying regional value chain integration."
+            "Parties": "ASEAN, Australia, China, Japan, South Korea, New Zealand",
+            "Effective Date": "June 2023 (Philippines)",
+            "Status": "ACTIVE",
+            "Tariff Schedule": "Phased elimination / Concession schedules",
+            "Rules of Origin": "Cumulation across RCEP signatories; RVC 40% or PSR",
+            "Data Status": "VERIFIED (Tariff Commission)"
         },
         {
-            "FTA Code": "AKFTA",
-            "Agreement Name": "ASEAN-Korea Free Trade Area",
-            "Partner Markets": "South Korea & ASEAN",
-            "Key Products": "Coconut Oil, Copper Products, Garments, Electronic Parts",
-            "Tariff Advantage": "90%+ tariff elimination with sensitive list exceptions",
-            "Strategic Value": "Major market access for Philippine oleochemicals and processed food."
+            "FTA Code": "PJEPA",
+            "Agreement Name": "Philippines-Japan Economic Partnership Agreement",
+            "Parties": "Philippines, Japan",
+            "Effective Date": "December 2008",
+            "Status": "ACTIVE",
+            "Tariff Schedule": "Bilateral reciprocal concessions",
+            "Rules of Origin": "Product-Specific Rules (PSR) / CTC / RVC",
+            "Data Status": "VERIFIED (DTI-EMB)"
         }
     ]
-
-def analyze_market_potential(demand, tariff_adv, logistics):
-    score = round((demand * 0.4) + (tariff_adv * 3.5) + (logistics * 25), 1)
-    if score >= 75:
-        tier = "Tier 1: Prime Target Market (High Demand & High Margin)"
-    elif score >= 50:
-        tier = "Tier 2: Viable Secondary Market (Moderate Potential)"
-    else:
-        tier = "Tier 3: Niche or High-Barrier Market"
-    return score, tier
-
-def check_create_more_eligibility(is_ree, export_ratio, directly_attributable):
-    logs = []
-    passed = True
-    if not is_ree:
-        passed = False
-        logs.append("❌ **Disqualification Notice:** Enterprise must be a Registered Export Enterprise (REE) under PEZA or Investment Promotion Agencies (IPAs) to qualify for CREATE MORE Act (RA 12066) incentives.")
-    else:
-        logs.append("✅ **REE Status Verified:** Enterprise is recognized as a Registered Export Enterprise.")
-    
-    if export_ratio >= 70.0:
-        logs.append(f"✅ **Export Threshold Met:** Export sales ratio is {export_ratio}% (Exceeds the 70% mandatory threshold for REEs).")
-    else:
-        passed = False
-        logs.append(f"❌ **Export Threshold Failed:** Export sales ratio is {export_ratio}%. Must be at least 70% to qualify for full fiscal incentives.")
-        
-    if directly_attributable:
-        logs.append("✅ **VAT Zero-Rating & Duty-Free Compliance:** Local purchases and imported capital equipment/raw materials are directly attributable to registered export activity under RA 12066.")
-    else:
-        passed = False
-        logs.append("❌ **Compliance Error:** Inputs must be directly attributable to export production to enjoy duty-free privileges.")
-        
-    if passed:
-        logs.append("### 🏆 Final Assessment: ELIGIBLE FOR CREATE MORE ACT (RA 12066) INCENTIVES\n* Entitled to **4% to 5% Special Corporate Income Tax (SCIT)** or up to **10-year Corporate Income Tax Holiday (ITH)** plus enhanced deductions.")
-    else:
-        logs.append("### ⚠️ Final Assessment: ACTION REQUIRED\n* Review operational thresholds before filing with PEZA or BOI.")
-    return passed, logs
