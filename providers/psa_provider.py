@@ -22,9 +22,9 @@ class PSAProvider:
   def query_classification(
       self, system="psgc", version="v1", query_params=None
   ):
-    """Queries official PSA classifications and maps them to trade analytics
+    """Queries official PSA classification systems (PSGC, PSIC, PSOC) for code
 
-    metrics, export exposure, and policy insights.
+    lookups.
     """
     system = system.lower()
     if not version or version == "version":
@@ -54,100 +54,90 @@ class PSAProvider:
           query_params.get("q", query_params.get("keyword", ""))
       ).lower()
 
-    # Advanced Trade-Analytics Integrated Database
-    analytics_database = [
+    # Clean official classification reference table (PSGC, PSIC, PSOC)
+    classification_database = [
         {
-            "Classification Code": "C.10",
-            "Sector / Commodity": "Manufacture of Food Products & Canning",
-            "Classification Type": "PSIC Industry",
-            "Est. Export Value (USD)": "$4.2B",
-            "Primary Export Markets": "Japan, USA, China, EU",
-            "Applicable FTAs": "RCEP, ATIGA, PH-EFTA",
-            "Trade Policy Outlook": (
-                "High growth potential for processed marine and agricultural"
-                " goods from Mindanao/BARMM."
-            ),
+            "Code": "01",
+            "Description": "Ilocos Region (Region I)",
+            "Classification System": "PSGC (Geographic)",
         },
         {
-            "Classification Code": "C.104",
-            "Sector / Commodity": "Vegetable and Animal Oils & Fats (Coconut Oil)",
-            "Classification Type": "PSIC Industry",
-            "Est. Export Value (USD)": "$1.8B",
-            "Primary Export Markets": "USA, Netherlands, China",
-            "Applicable FTAs": "GSP+, ATIGA, RCEP",
-            "Trade Policy Outlook": (
-                "Major traditional export earner; requires strict compliance"
-                " with Rules of Origin (>=40% RVC)."
-            ),
+            "Code": "02",
+            "Description": "Cagayan Valley (Region II)",
+            "Classification System": "PSGC (Geographic)",
         },
         {
-            "Classification Code": "A.01",
-            "Sector / Commodity": (
-                "Crop Production: Coffee Beans & High-Value Crops"
-            ),
-            "Classification Type": "PSIC Industry",
-            "Est. Export Value (USD)": "$320M",
-            "Primary Export Markets": "Middle East, US Specialty Markets",
-            "Applicable FTAs": "Bilateral Pacts, RCEP",
-            "Trade Policy Outlook": (
-                "High priority for BARMM agricultural development and local"
-                " cooperative clustering."
-            ),
+            "Code": "03",
+            "Description": "Central Luzon (Region III)",
+            "Classification System": "PSGC (Geographic)",
         },
         {
-            "Classification Code": "A.03",
-            "Sector / Commodity": (
-                "Fishing & Aquaculture (Yellowfin Tuna & Pelagic)"
-            ),
-            "Classification Type": "PSIC Industry",
-            "Est. Export Value (USD)": "$950M",
-            "Primary Export Markets": "EU, Japan, US, ASEAN",
-            "Applicable FTAs": "EU GSP+ (Subject to renewal), ATIGA",
-            "Trade Policy Outlook": (
-                "Crucial sector for General Santos and Southern Philippines"
-                " maritime trade corridors."
-            ),
+            "Code": "04A",
+            "Description": "CALABARZON (Region IV-A)",
+            "Classification System": "PSGC (Geographic)",
         },
         {
-            "Classification Code": "G.46",
-            "Sector / Commodity": "Wholesale Trade & Commission Distribution",
-            "Classification Type": "PSIC Industry",
-            "Est. Export Value (USD)": "N/A (Logistics Enabler)",
-            "Primary Export Markets": "Domestic / Regional Hubs",
-            "Applicable FTAs": "National Infrastructure",
-            "Trade Policy Outlook": (
-                "Key facilitator for supply chain integration between ecozones"
-                " and ports."
-            ),
+            "Code": "11",
+            "Description": "Davao Region (Region XI)",
+            "Classification System": "PSGC (Geographic)",
         },
         {
-            "Classification Code": "14",
-            "Sector / Commodity": (
+            "Code": "14",
+            "Description": (
                 "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)"
             ),
-            "Classification Type": "PSGC Geographic Region",
-            "Est. Export Value (USD)": "$650M (Regional Total)",
-            "Primary Export Markets": "ASEAN (Malaysia, Indonesia, Brunei BIMP-EAGA)",
-            "Applicable FTAs": "BIMP-EAGA, ATIGA, RCEP",
-            "Trade Policy Outlook": (
-                "Strategic focus area for cross-border Halal trade, marine"
-                " products, and agricultural expansion."
+            "Classification System": "PSGC (Geographic)",
+        },
+        {
+            "Code": "A.01",
+            "Description": (
+                "Crop and animal production, hunting and related service"
+                " activities"
             ),
+            "Classification System": "PSIC (Industry)",
+        },
+        {
+            "Code": "A.03",
+            "Description": "Fishing and aquaculture",
+            "Classification System": "PSIC (Industry)",
+        },
+        {
+            "Code": "C.10",
+            "Description": "Manufacture of food products",
+            "Classification System": "PSIC (Industry)",
+        },
+        {
+            "Code": "C.104",
+            "Description": (
+                "Manufacture of vegetable and animal oils and fats"
+            ),
+            "Classification System": "PSIC (Industry)",
+        },
+        {
+            "Code": "6",
+            "Description": (
+                "Skilled agricultural, forestry and fishery workers"
+            ),
+            "Classification System": "PSOC (Occupation)",
+        },
+        {
+            "Code": "7",
+            "Description": "Craft and related trades workers",
+            "Classification System": "PSOC (Occupation)",
         },
     ]
 
-    # Filter dynamically based on search term
+    # Filter records dynamically based on search term
     if search_term:
       filtered_data = [
           item
-          for item in analytics_database
-          if search_term in item["Classification Code"].lower()
-          or search_term in item["Sector / Commodity"].lower()
-          or search_term in item["Classification Type"].lower()
-          or search_term in item["Trade Policy Outlook"].lower()
+          for item in classification_database
+          if search_term in item["Code"].lower()
+          or search_term in item["Description"].lower()
+          or search_term in item["Classification System"].lower()
       ]
     else:
-      filtered_data = analytics_database
+      filtered_data = classification_database
 
     return {
         "status": "VERIFIED_OFFLINE_CACHE",
@@ -157,18 +147,11 @@ class PSAProvider:
         if filtered_data
         else [
             {
-                "Classification Code": "N/A",
-                "Sector / Commodity": (
-                    f"No analytical records mapped for '{search_term}'."
+                "Code": "N/A",
+                "Description": (
+                    f"No classification matches found for '{search_term}'."
                 ),
-                "Classification Type": "Notice",
-                "Est. Export Value (USD)": "-",
-                "Primary Export Markets": "-",
-                "Applicable FTAs": "-",
-                "Trade Policy Outlook": (
-                    "Try searching keywords like 'Food', 'Oil', 'Coffee',"
-                    " 'Fishing', or 'BARMM'."
-                ),
+                "Classification System": "Notice",
             }
         ],
     }
