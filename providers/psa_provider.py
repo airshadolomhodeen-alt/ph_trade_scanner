@@ -13,44 +13,45 @@ class PSAProvider:
           "PSA_API_TOKEN", "5e05d993-a8b9-4f1c-8e5b-6c02b7ba45d3"
       )
 
-    # Official PSA Classification domain base URL from your documentation
+    # Official PSA classification base domain
     self.base_url = "https://classification.psa.gov.ph"
 
   def query_classification(
-      self, classification_type="psoc", version="v1", endpoint="all"
+      self, system="psgc", version="v1", query_params=None
   ):
-    """Queries official PSA classification endpoints (PSGC, PSOC, PCOICOP)."""
-    url = f"{self.base_url}/api/{classification_type.lower()}/{version}/{endpoint}"
+    """Queries official PSA classification systems (psgc, psoc, etc.)
 
-    # PSA APIs typically accept token via Bearer or custom headers/params
+    using required path version and query token.
+    """
+    system = system.lower()
+    # Ensure version defaults to 'v1' or a valid string
+    if not version or version == "version":
+      version = "v1"
+
+    url = f"{self.base_url}/{system}/{version}/all"
+
+    params = {"token": self.token}
+    if query_params and isinstance(query_params, dict):
+      params.update(query_params)
+
     headers = {
-        "Authorization": f"Bearer {self.token}",
         "Accept": "application/json",
         "User-Agent": "PH-Trade-Intelligence-Terminal/4.5",
     }
 
     try:
-      response = requests.get(url, headers=headers, timeout=15)
+      response = requests.get(
+          url, headers=headers, params=params, timeout=15
+      )
       if response.status_code == 200:
         return {"status": "VERIFIED", "data": response.json()}
-      elif response.status_code == 403:
-        # Fallback query attempt using token as a query parameter if header is restricted
-        alt_response = requests.get(
-            url, params={"token": self.token}, timeout=15
-        )
-        if alt_response.status_code == 200:
-          return {"status": "VERIFIED", "data": alt_response.json()}
-        return {
-            "status": "FORBIDDEN",
-            "message": (
-                "Access forbidden (403). Please check if the version string"
-                " (e.g., v1) matches your documentation parameter."
-            ),
-        }
       else:
         return {
             "status": "ERROR",
-            "message": f"API returned status code {response.status_code}",
+            "message": (
+                f"API returned status code {response.status_code}. Response:"
+                f" {response.text}"
+            ),
         }
     except Exception as e:
       return {"status": "EXCEPTION", "message": str(e)}
