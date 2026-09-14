@@ -16,10 +16,10 @@ from trade_stats import OpportunityEngine, OriginEngine
 from fta_analyzer import FTAEngine
 
 st.set_page_config(
-    page_title='PH Trade Intelligence | National FTA & Market Access Terminal',
-    page_icon='🇵🇭',
-    layout='wide',
-    initial_sidebar_state='expanded',
+    page_title="PH Trade Intelligence | National FTA & Market Access Terminal",
+    page_icon="🇵🇭",
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # --- PROFESSIONAL TRADE TERMINAL CSS ---
@@ -71,12 +71,12 @@ matrix_eng = TradeAnalyticsMatrix()
 
 @st.cache_data
 def load_ahtn_dataset():
-  csv_path = 'ahtn_2022_master.csv'
+  csv_path = "ahtn_2022_master.csv"
   if os.path.exists(csv_path):
     try:
-      df = pd.read_csv(csv_path, encoding='latin1')
-      df = df.dropna(subset=['ProductCode'])
-      df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+      df = pd.read_csv(csv_path, encoding="latin1")
+      df = df.dropna(subset=["ProductCode"])
+      df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
       return df
     except Exception:
       return pd.DataFrame()
@@ -86,71 +86,71 @@ def load_ahtn_dataset():
 ahtn_df = load_ahtn_dataset()
 
 # --- SIDEBAR NAVIGATION & CREDENTIALS ---
-st.sidebar.title('🇵🇭 PH Trade Intelligence')
-st.sidebar.markdown('**National Trade Access Portal v4.5**')
-st.sidebar.markdown('---')
+st.sidebar.title("🇵🇭 PH Trade Intelligence")
+st.sidebar.markdown("**National Trade Access Portal v4.5**")
+st.sidebar.markdown("---")
 
 nav_selection = st.sidebar.radio(
-    'Navigation Menu',
+    "Navigation Menu",
     [
-        'Home / Executive Dashboard',
-        'Top 20 Country Destinations & Matrices',
-        'AHTN 2022 Product Nomenclature',
-        'PSA Official Classification API Gateway',  # <-- NEW PSA API TAB
-        'Bilateral Market Access & Multi-API Engine',
-        'Rules of Origin (RVC) Compliance',
-        'Economic Zones, Ports & ITC Intelligence',
-        'Maritime & Vessel Traffic Intelligence',
-        'n8n Workflow & Automation Trigger',  # <-- NEW n8n TAB
-        'Data Sources & Provenance',
+        "Home / Executive Dashboard",
+        "Top 20 Country Destinations & Matrices",
+        "AHTN 2022 Product Nomenclature",
+        "PSA Official Classification API Gateway",  # <-- UPGRADED STUDIO TAB
+        "Bilateral Market Access & Multi-API Engine",
+        "Rules of Origin (RVC) Compliance",
+        "Economic Zones, Ports & ITC Intelligence",
+        "Maritime & Vessel Traffic Intelligence",
+        "n8n Workflow & Automation Trigger",
+        "Data Sources & Provenance",
     ],
 )
 
-st.sidebar.markdown('---')
-st.sidebar.subheader('🔌 Live Institutional Gateways')
-st.sidebar.markdown('🟢 **PSA Classification API**: Active')
-st.sidebar.markdown('🟢 **UN Comtrade API**: Active')
-st.sidebar.markdown('🟢 **World Bank WITS**: Active')
-st.sidebar.markdown('🟢 **PEZA Official Portal**: Active')
-st.sidebar.markdown('🟢 **Subic Port Portal**: Active')
-st.sidebar.markdown('🟢 **ITC Trade Map**: Active')
-st.sidebar.markdown('🟢 **Data Docked Maritime API**: Active')
-st.sidebar.markdown(f'🟢 **AHTN DB**: {len(ahtn_df):,} Records')
+st.sidebar.markdown("---")
+st.sidebar.subheader("🔌 Live Institutional Gateways")
+st.sidebar.markdown("🟢 **PSA Classification API**: Active")
+st.sidebar.markdown("🟢 **UN Comtrade API**: Active")
+st.sidebar.markdown("🟢 **World Bank WITS**: Active")
+st.sidebar.markdown("🟢 **PEZA Official Portal**: Active")
+st.sidebar.markdown("🟢 **Subic Port Portal**: Active")
+st.sidebar.markdown("🟢 **ITC Trade Map**: Active")
+st.sidebar.markdown("🟢 **Data Docked Maritime API**: Active")
+st.sidebar.markdown(f"🟢 **AHTN DB**: {len(ahtn_df):,} Records")
 
-st.sidebar.markdown('---')
-st.sidebar.subheader('📌 Developer & Notice')
-st.sidebar.markdown('**Developer**: ENGR. AIRSAD R. OLOMODIN, MBA, CBE, PhD')
+st.sidebar.markdown("---")
+st.sidebar.subheader("📌 Developer & Notice")
+st.sidebar.markdown("**Developer**: ENGR. AIRSAD R. OLOMODIN, MBA, CBE, PhD")
 st.sidebar.markdown(
     '<small><b>Disclaimer</b>: This analytical decision-support terminal is'
-    ' developed strictly for the personal use of authorized policy-makers and'
-    ' trade officials within the Bangsamoro Autonomous Region in Muslim'
-    ' Mindanao (BARMM). All simulated outputs, tariff schedules, and'
-    ' bilateral data indices are intended exclusively for strategic guidance,'
-    ' exploratory scenario planning, and institutional research.</small>',
+    " developed strictly for the personal use of authorized policy-makers and"
+    " trade officials within the Bangsamoro Autonomous Region in Muslim"
+    " Mindanao (BARMM). All simulated outputs, tariff schedules, and"
+    " bilateral data indices are intended exclusively for strategic guidance,"
+    " exploratory scenario planning, and institutional research.</small>",
     unsafe_allow_html=True,
 )
 
 # --- APP ROUTING ---
-if nav_selection == 'Home / Executive Dashboard':
-  st.title('National Trade Intelligence & FTA Scanner')
+if nav_selection == "Home / Executive Dashboard":
+  st.title("National Trade Intelligence & FTA Scanner")
   st.markdown(
-      '### Institutional Decision-Support Terminal for Philippine Exporters &'
-      ' Trade Attaches'
+      "### Institutional Decision-Support Terminal for Philippine Exporters &"
+      " Trade Attaches"
   )
   st.markdown(
-      'Independent analytics platform evaluating preferential tariffs,'
-      ' bilateral trade positions for **The Philippines (PHL - ISO 608)**, and'
-      ' regional economic zones.'
+      "Independent analytics platform evaluating preferential tariffs,"
+      " bilateral trade positions for **The Philippines (PHL - ISO 608)**, and"
+      " regional economic zones."
   )
-  st.markdown('---')
+  st.markdown("---")
 
   c1, c2, c3, c4 = st.columns(4)
-  c1.metric('Reporting Economy', 'Philippines (PHL)', 'ISO Code: 608')
-  c2.metric('Nomenclature Standard', 'AHTN 2022', 'Official BOC Baseline')
-  c3.metric('Covered Trade Pacts', '10+ FTAs', 'ATIGA, RCEP, Bilateral')
-  c4.metric('Database Integrity', f'{len(ahtn_df):,} Codes', 'Optimized Search')
+  c1.metric("Reporting Economy", "Philippines (PHL)", "ISO Code: 608")
+  c2.metric("Nomenclature Standard", "AHTN 2022", "Official BOC Baseline")
+  c3.metric("Covered Trade Pacts", "10+ FTAs", "ATIGA, RCEP, Bilateral")
+  c4.metric("Database Integrity", f"{len(ahtn_df):,} Codes", "Optimized Search")
 
-  st.markdown('<br>', unsafe_allow_html=True)
+  st.markdown("<br>", unsafe_allow_html=True)
 
   col_a, col_b = st.columns(2)
   with col_a:
@@ -183,20 +183,20 @@ if nav_selection == 'Home / Executive Dashboard':
         unsafe_allow_html=True,
     )
 
-elif nav_selection == 'Top 20 Country Destinations & Matrices':
-  st.title('Philippine Macroeconomic Top 20 Trade Matrices')
+elif nav_selection == "Top 20 Country Destinations & Matrices":
+  st.title("Philippine Macroeconomic Top 20 Trade Matrices")
   st.markdown(
       "Comprehensive statistical breakdown of the Philippines' Top 20 export"
-      ' markets and import origins based on official PSA and WITS trade records.'
+      " markets and import origins based on official PSA and WITS trade records."
   )
-  st.markdown('---')
+  st.markdown("---")
 
   tab_exp, tab_imp = st.tabs(
-      ['🇺🇸 Top 20 Export Destinations', '🇨🇳 Top 20 Import Origins']
+      ["🇺🇸 Top 20 Export Destinations", "🇨🇳 Top 20 Import Origins"]
   )
 
   with tab_exp:
-    st.subheader('Philippine Top 20 Export Partner Markets')
+    st.subheader("Philippine Top 20 Export Partner Markets")
     st.dataframe(
         matrix_eng.get_export_df(),
         use_container_width=True,
@@ -205,7 +205,7 @@ elif nav_selection == 'Top 20 Country Destinations & Matrices':
     )
 
   with tab_imp:
-    st.subheader('Philippine Top 20 Import Origin Markets')
+    st.subheader("Philippine Top 20 Import Origin Markets")
     st.dataframe(
         matrix_eng.get_import_df(),
         use_container_width=True,
@@ -213,7 +213,7 @@ elif nav_selection == 'Top 20 Country Destinations & Matrices':
         hide_index=True,
     )
 
-  st.markdown('<br>', unsafe_allow_html=True)
+  st.markdown("<br>", unsafe_allow_html=True)
   st.markdown(
       """
     <div class="card-container">
@@ -228,25 +228,25 @@ elif nav_selection == 'Top 20 Country Destinations & Matrices':
       unsafe_allow_html=True,
   )
 
-elif nav_selection == 'AHTN 2022 Product Nomenclature':
-  st.title('AHTN 2022 Product & HS Code Nomenclature')
+elif nav_selection == "AHTN 2022 Product Nomenclature":
+  st.title("AHTN 2022 Product & HS Code Nomenclature")
   st.markdown(
-      'Search official tariff classification codes, descriptions, and'
-      ' structural chapters for Philippine trade compliance.'
+      "Search official tariff classification codes, descriptions, and"
+      " structural chapters for Philippine trade compliance."
   )
 
   search_query = st.text_input(
       "🔍 Search by HS Code, AHTN Code, or Keyword (e.g., 'coconut oil',"
       " '1513', 'tuna', 'semiconductors'):",
-      '',
+      "",
   )
 
   if not ahtn_df.empty:
     if search_query:
       q = search_query.lower()
       res = ahtn_df[
-          ahtn_df['ProductCode'].astype(str).str.lower().str.contains(q)
-          | ahtn_df['Product Description']
+          ahtn_df["ProductCode"].astype(str).str.lower().str.contains(q)
+          | ahtn_df["Product Description"]
           .astype(str)
           .str.lower()
           .str.contains(q)
@@ -254,112 +254,202 @@ elif nav_selection == 'AHTN 2022 Product Nomenclature':
     else:
       res = ahtn_df.head(100)
 
-    st.markdown(f'**Displaying {len(res):,} matching tariff records:**')
+    st.markdown(f"**Displaying {len(res):,} matching tariff records:**")
     st.dataframe(res, use_container_width=True, height=500)
   else:
-    st.error('`ahtn_2022_master.csv` not found in root directory.')
+    st.error("`ahtn_2022_master.csv` not found in root directory.")
 
-elif nav_selection == 'PSA Official Classification API Gateway':
-  st.title('🏛️ Philippine Statistics Authority (PSA) Classification Gateway')
+elif nav_selection == "PSA Official Classification API Gateway":
+  st.title("🏛️ PSA Sector & Economic Intelligence Studio")
   st.markdown(
-      'Query official classification systems live using your authenticated'
-      ' institutional API token.'
+      "Advanced analytical workspace mapping official Philippine Statistics"
+      " Authority (PSA) standard classifications to trade exposure, regional"
+      " production capacity, and economic indicators."
   )
-  st.markdown('---')
+  st.markdown("---")
 
-  with st.container():
-    st.markdown('<div class="card-container">', unsafe_allow_html=True)
-    st.subheader('Live PSA API Query Console')
-    psa_query = st.text_input(
-        'Enter Classification Search Term or Code:', 'Agricultural'
+  # Load the core dataset via PSA provider
+  psa_result = psa_prov.query_classification(query_params={})
+  df_psa = pd.DataFrame(psa_result.get("data", []))
+
+  # --- TOP ANALYTICAL METRICS ROW ---
+  m1, m2, m3, m4 = st.columns(4)
+  m1.metric("Tracked Standard Codes", len(df_psa), "PSGC, PSIC, PSOC")
+  m2.metric(
+      "Primary Classification Systems", "3 Frameworks", "Geographic, Industry, Occ."
+  )
+  m3.metric(
+      "Economic Integration Level",
+      "Active",
+      "Mapped to Regional Corridors",
+  )
+  m4.metric("Data Engine Status", "Optimized", "Zero-Latency Local Cache")
+
+  st.markdown("<br>", unsafe_allow_html=True)
+
+  # --- INTERACTIVE FILTER CONTROLS ---
+  st.markdown('<div class="card-container">', unsafe_allow_html=True)
+  st.subheader("🎛️ Multi-Parameter Sector Filter & Query Engine")
+
+  col_f1, col_f2 = st.columns(2)
+  with col_f1:
+    selected_system = st.selectbox(
+        "Filter by Classification Framework:",
+        [
+            "All Frameworks",
+            "PSGC (Geographic)",
+            "PSIC (Industry)",
+            "PSOC (Occupation)",
+        ],
     )
-    run_psa_btn = st.button(
-        '🔍 Query PSA Classification API', type='primary', use_container_width=True
+  with col_f2:
+    search_keyword = st.text_input(
+        "Search Sectors or Keywords (e.g., 'Food', 'Fishing', 'Region', 'Crop'):",
+        "",
     )
-    st.markdown('</div>', unsafe_allow_html=True)
 
-  if run_psa_btn:
-    with st.spinner(
-        'Communicating with PSA Classification API endpoint securely...'
-    ):
-      psa_result = psa_prov.query_classification(query_params={"q": psa_query})
+  st.markdown("</div>", unsafe_allow_html=True)
+  st.markdown("<br>", unsafe_allow_html=True)
 
-    if psa_result.get('status') in ['VERIFIED', 'VERIFIED_OFFLINE_CACHE']:
-      st.success(
-          f"✅ PSA Classification query executed successfully! Status:"
-          f" [{psa_result.get('status')}]"
-      )
+  # Apply dynamic filtering based on user interactive controls
+  filtered_df = df_psa.copy()
+  if selected_system != "All Frameworks":
+    sys_code = selected_system.split(" ")[0]
+    filtered_df = filtered_df[
+        filtered_df["Classification System"].str.contains(sys_code, na=False)
+    ]
 
-      data_payload = psa_result.get('data', [])
-      if isinstance(data_payload, list) and data_payload:
-        df_psa = pd.DataFrame(data_payload)
-        st.dataframe(df_psa, use_container_width=True)
-      elif isinstance(data_payload, dict):
-        st.json(data_payload)
-      else:
-        st.info("No structured dataset array returned in payload.")
+  if search_keyword:
+    kw = search_keyword.lower()
+    filtered_df = filtered_df[
+        filtered_df["Code"].str.lower().str.contains(kw)
+        | filtered_df["Description"].str.lower().str.contains(kw)
+        | filtered_df["Classification System"].str.lower().str.contains(kw)
+    ]
+
+  # --- ANALYTICAL TABS FOR DEEP INSIGHTS ---
+  tab_table, tab_analytics, tab_insights = st.tabs(
+      [
+          "📋 Filtered Master Records",
+          "📊 Framework Distribution Analytics",
+          "💡 Strategic Trade Policy Implications",
+      ]
+  )
+
+  with tab_table:
+    st.subheader(
+        f"Matching Classification Records ({len(filtered_df)} entries found)"
+    )
+    if not filtered_df.empty:
+      st.dataframe(filtered_df, use_container_width=True, hide_index=True)
     else:
       st.info(
-          'ℹ️ Connected to PSA Gateway endpoint using token. Response details:'
-          f" {psa_result.get('message', 'No payload returned.')}"
+          "No records match your specific filter combination. Try clearing"
+          " keywords."
       )
 
-elif nav_selection == 'Bilateral Market Access & Multi-API Engine':
-  st.title('Bilateral Market Access & Multi-API Analytics Engine')
+  with tab_analytics:
+    st.subheader("📊 Distribution of Active Classifications by Framework")
+    if not df_psa.empty:
+      system_counts = df_psa["Classification System"].value_counts().reset_index()
+      system_counts.columns = ["Framework", "Count"]
+
+      col_chart1, col_chart2 = st.columns(2)
+      with col_chart1:
+        st.bar_chart(system_counts.set_index("Framework"))
+      with col_chart2:
+        st.markdown(
+            """
+                <div class="card-container">
+                    <h4>Analytical Breakdown</h4>
+                    <p>This distribution shows how standard national coding covers administrative domains:</p>
+                    <ul>
+                        <li><b>PSGC</b> maps spatial regions and trade route nodes.</li>
+                        <li><b>PSIC</b> defines sector-specific industrial output capacities.</li>
+                        <li><b>PSOC</b> tracks labor force availability and skill clustering.</li>
+                    </ul>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
+    else:
+      st.warning("Insufficient data available for graphical breakdown.")
+
+  with tab_insights:
+    st.subheader(
+        "💡 Strategic Alignment with Philippine Export & Regional Policy"
+    )
+    st.markdown(
+        """
+        <div class="card-container">
+            <h4>Connecting Standards to Trade Strategy</h4>
+            <p>Official classification standards are not just bureaucratic codes; they serve structural functions in international trade agreements:</p>
+            <ul>
+                <li><b>Rules of Origin (RVO/RVC) Compliance</b>: PSIC industry codes help trace whether raw inputs processed in regions like Mindanao or CALABARZON meet the required local value addition thresholds under ATIGA and RCEP.</li>
+                <li><b>Regional Supply Chain Mapping</b>: Pairing geographic codes (PSGC) with industrial sectors (PSIC) allows trade analysts to pinpoint bottlenecks in transport corridors and domestic distribution channels.</li>
+                <li><b>Labor & Skill Intensity</b>: Integrating occupational standards (PSOC) ensures that export promotion policies match local workforce competencies.</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+elif nav_selection == "Bilateral Market Access & Multi-API Engine":
+  st.title("Bilateral Market Access & Multi-API Analytics Engine")
   st.markdown(
-      'Evaluate bilateral trade flows originating from **The Philippines (PHL'
-      ' - 608)** to key partner markets under specific Free Trade Agreements.'
+      "Evaluate bilateral trade flows originating from **The Philippines (PHL"
+      " - 608)** to key partner markets under specific Free Trade Agreements."
   )
 
   with st.container():
     st.markdown('<div class="card-container">', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
-      hs = st.text_input('Enter 6-digit HS / AHTN Code:', '151311')
+      hs = st.text_input("Enter 6-digit HS / AHTN Code:", "151311")
       market = st.selectbox(
-          'Target Export Partner Market:',
+          "Target Export Partner Market:",
           [
-              'United States (USA - 842)',
-              'Japan (JPN - 392)',
-              'Mainland China (CHN - 156)',
-              'Hong Kong (HKG - 344)',
-              'Singapore (SGP - 702)',
-              'Thailand (THA - 764)',
-              'Germany (DEU - 276)',
-              'South Korea (KOR - 410)',
-              'Netherlands (NLD - 528)',
-              'Malaysia (MYS - 458)',
-              'Taiwan (TWN - 158)',
-              'Vietnam (VNM - 704)',
-              'Indonesia (IDN - 360)',
+              "United States (USA - 842)",
+              "Japan (JPN - 392)",
+              "Mainland China (CHN - 156)",
+              "Hong Kong (HKG - 344)",
+              "Singapore (SGP - 702)",
+              "Thailand (THA - 764)",
+              "Germany (DEU - 276)",
+              "South Korea (KOR - 410)",
+              "Netherlands (NLD - 528)",
+              "Malaysia (MYS - 458)",
+              "Taiwan (TWN - 158)",
+              "Vietnam (VNM - 704)",
+              "Indonesia (IDN - 360)",
           ],
       )
     with col2:
       fta = st.selectbox(
-          'Select Preferential Trade Agreement:', tariff_eng.supported_ftas
+          "Select Preferential Trade Agreement:", tariff_eng.supported_ftas
       )
-      year = st.selectbox('Trade Statistical Year:', ['2025', '2024', '2023'])
+      year = st.selectbox("Trade Statistical Year:", ["2025", "2024", "2023"])
 
     scan_btn = st.button(
-        '🚀 Execute Live Bilateral Multi-API Scan',
-        type='primary',
+        "🚀 Execute Live Bilateral Multi-API Scan",
+        type="primary",
         use_container_width=True,
     )
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
   if scan_btn:
     with st.spinner(
-        'Querying UN Comtrade (PHL exports), WITS tariff databases, and'
-        ' calculating preference margins...'
+        "Querying UN Comtrade (PHL exports), WITS tariff databases, and"
+        " calculating preference margins..."
     ):
-      p_code = market.split('(')[1].split('-')[1].strip().replace(')', '')
-      trade_res = comtrade.fetch_trade_data('608', p_code, year, hs)
+      p_code = market.split("(")[1].split("-")[1].strip().replace(")", "")
+      trade_res = comtrade.fetch_trade_data("608", p_code, year, hs)
       tariff_res = tariff_eng.get_fta_tariff(hs, fta, partner=p_code)
 
-    st.markdown(f'### Bilateral Trade & Tariff Assessment')
+    st.markdown(f"### Bilateral Trade & Tariff Assessment")
     st.markdown(
-        f'**Exporting Country**: 🇵🇭 Philippines (608)  |  **Partner Market**:'
-        f' {market}'
+        f"**Exporting Country**: 🇵🇭 Philippines (608)  |  **Partner Market**:"
+        f" {market}"
     )
     st.info(f"**Product Nomenclature Description**: {tariff_res['description']}")
 
@@ -370,23 +460,23 @@ elif nav_selection == 'Bilateral Market Access & Multi-API Engine':
       st.success(f"**WITS Tariff Engine Status**: {tariff_res['wits_api_status']}")
 
     m1, m2, m3 = st.columns(3)
-    m1.metric('MFN Baseline Tariff', f"{tariff_res['mfn_rate']}%", 'Standard Rate')
+    m1.metric("MFN Baseline Tariff", f"{tariff_res['mfn_rate']}%", "Standard Rate")
     m2.metric(
-        'FTA Preferential Rate',
+        "FTA Preferential Rate",
         f"{tariff_res['preferential_rate']}%",
-        f'Under {fta}',
+        f"Under {fta}",
     )
     m3.metric(
-        'Preference Margin',
+        "Preference Margin",
         f"{tariff_res['preference_margin']}%",
-        'Duty Savings Advantage',
+        "Duty Savings Advantage",
     )
 
-elif nav_selection == 'Rules of Origin (RVC) Compliance':
-  st.title('Rules of Origin (RVC) Compliance Engine')
+elif nav_selection == "Rules of Origin (RVC) Compliance":
+  st.title("Rules of Origin (RVC) Compliance Engine")
   st.markdown(
-      'Verify Regional Value Content (RVC) thresholds required for Philippine'
-      ' products to qualify for preferential tariffs under ASEAN agreements.'
+      "Verify Regional Value Content (RVC) thresholds required for Philippine"
+      " products to qualify for preferential tariffs under ASEAN agreements."
   )
 
   with st.container():
@@ -394,163 +484,163 @@ elif nav_selection == 'Rules of Origin (RVC) Compliance':
     col_in1, col_in2 = st.columns(2)
     with col_in1:
       fob = st.number_input(
-          'Philippine FOB Export Value (USD):',
+          "Philippine FOB Export Value (USD):",
           value=25000.0,
           step=1000.0,
-          format='%.2f',
+          format="%.2f",
       )
     with col_in2:
       non_orig = st.number_input(
-          'Value of Non-Originating Materials (CIF USD):',
+          "Value of Non-Originating Materials (CIF USD):",
           value=8500.0,
           step=500.0,
-          format='%.2f',
+          format="%.2f",
       )
 
     calc_btn = st.button(
-        '⚖️ Run Philippine RVC Qualification Audit',
-        type='primary',
+        "⚖️ Run Philippine RVC Qualification Audit",
+        type="primary",
         use_container_width=True,
     )
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
   if calc_btn:
     res = origin_eng.calculate_rvc_fob(fob, non_orig)
-    rvc_val = res['rvc_percentage']
+    rvc_val = res["rvc_percentage"]
 
-    st.markdown('### Compliance Audit Findings')
+    st.markdown("### Compliance Audit Findings")
     col_res1, col_res2 = st.columns([1, 2])
     with col_res1:
-      st.metric('Calculated RVC', f'{rvc_val}%', 'Threshold: >= 40%')
+      st.metric("Calculated RVC", f"{rvc_val}%", "Threshold: >= 40%")
     with col_res2:
       st.progress(min(max(float(rvc_val) / 100.0, 0.0), 1.0))
 
-    if res['passed']:
+    if res["passed"]:
       st.success(
-          '✅ **STATUS: FULLY QUALIFIED** — The product meets standard Regional'
-          ' Value Content criteria for preferential tariff treatment under'
-          ' Philippine FTA frameworks.'
+          "✅ **STATUS: FULLY QUALIFIED** — The product meets standard Regional"
+          " Value Content criteria for preferential tariff treatment under"
+          " Philippine FTA frameworks."
       )
     else:
       st.warning(
-          '⚠️ **STATUS: NON-QUALIFIED** — Regional value content falls below'
-          ' the required threshold. Consider sourcing local component materials'
-          ' within the Philippines or ASEAN.'
+          "⚠️ **STATUS: NON-QUALIFIED** — Regional value content falls below"
+          " the required threshold. Consider sourcing local component materials"
+          " within the Philippines or ASEAN."
       )
 
-elif nav_selection == 'Economic Zones, Ports & ITC Intelligence':
-  st.title('Economic Zones, Ports & Global Trade Intelligence')
+elif nav_selection == "Economic Zones, Ports & ITC Intelligence":
+  st.title("Economic Zones, Ports & Global Trade Intelligence")
   st.markdown(
-      'Direct institutional access to Philippine investment zones, port'
-      ' logistics, and international trade analytics.'
+      "Direct institutional access to Philippine investment zones, port"
+      " logistics, and international trade analytics."
   )
 
   tab1, tab2, tab3 = st.tabs(
       [
-          '🌐 PEZA Investment Portals',
-          '🚢 Subic Bay Freeport Port',
-          '🌍 ITC Trade Map Centre',
+          "🌐 PEZA Investment Portals",
+          "🚢 Subic Bay Freeport Port",
+          "🌍 ITC Trade Map Centre",
       ]
   )
 
   with tab1:
-    st.subheader('Philippine Economic Zone Authority (PEZA)')
+    st.subheader("Philippine Economic Zone Authority (PEZA)")
     st.markdown(
-        'Access official investment locators, ecozone directories, and'
-        ' regulatory issuances.'
+        "Access official investment locators, ecozone directories, and"
+        " regulatory issuances."
     )
-    st.markdown('🔗 [Open Official PEZA Portal](https://www.peza.gov.ph)')
-    if st.button('Query PEZA Portal Status', type='primary'):
-      with st.spinner('Verifying PEZA gateway connectivity...'):
+    st.markdown("🔗 [Open Official PEZA Portal](https://www.peza.gov.ph)")
+    if st.button("Query PEZA Portal Status", type="primary"):
+      with st.spinner("Verifying PEZA gateway connectivity..."):
         peza_res = peza.fetch_peza_resources()
-      if peza_res['status'] == 'VERIFIED':
-        st.success('PEZA Portal connection verified successfully!')
-        for idx, item in enumerate(peza_res['data'], 1):
+      if peza_res["status"] == "VERIFIED":
+        st.success("PEZA Portal connection verified successfully!")
+        for idx, item in enumerate(peza_res["data"], 1):
           st.markdown(f"{idx}. [{item['title']}]({item['url']})")
       else:
         st.info(
-            'Direct server connection active. Click the secure link above to'
-            ' browse PEZA archives.'
+            "Direct server connection active. Click the secure link above to"
+            " browse PEZA archives."
         )
 
   with tab2:
-    st.subheader('Subic Bay Freeport & Port Infrastructure')
+    st.subheader("Subic Bay Freeport & Port Infrastructure")
     st.markdown(
-        'Examine maritime shipping intelligence, vessel tracking, and logistics'
-        ' capacity.'
+        "Examine maritime shipping intelligence, vessel tracking, and logistics"
+        " capacity."
     )
     st.markdown(
-        '🔗 [Open Subic Bay Port'
-        ' Terminal](https://ship.mysubicbay.com.ph/ship-my-subic-bay)'
+        "🔗 [Open Subic Bay Port"
+        " Terminal](https://ship.mysubicbay.com.ph/ship-my-subic-bay)"
     )
-    if st.button('Query Subic Port Overview', type='primary'):
-      with st.spinner('Connecting to Subic Bay port servers...'):
+    if st.button("Query Subic Port Overview", type="primary"):
+      with st.spinner("Connecting to Subic Bay port servers..."):
         subic_res = subic_port.fetch_subic_port_info()
-      if subic_res['status'] == 'VERIFIED':
-        st.success('Subic Bay port profile loaded successfully!')
+      if subic_res["status"] == "VERIFIED":
+        st.success("Subic Bay port profile loaded successfully!")
         st.markdown(f"**Active Portal Title**: {subic_res['title']}")
-        for highlight in subic_res['highlights'][:5]:
-          st.markdown(f'* {highlight}')
+        for highlight in subic_res["highlights"][:5]:
+          st.markdown(f"* {highlight}")
       else:
         st.warning(
-            'Could not pull dynamic summary. Access portal directly via the'
-            ' link above.'
+            "Could not pull dynamic summary. Access portal directly via the"
+            " link above."
         )
 
   with tab3:
-    st.subheader('International Trade Centre (ITC) Gateways')
+    st.subheader("International Trade Centre (ITC) Gateways")
     st.markdown(
-        'Access global trade maps, export potential indicators, and market'
-        ' access requirements.'
+        "Access global trade maps, export potential indicators, and market"
+        " access requirements."
     )
 
     col_a, col_b = st.columns(2)
     with col_a:
       st.markdown(
-          '🔗 [Open Public ITC Resources Portal](https://www.intracen.org/)'
+          "🔗 [Open Public ITC Resources Portal](https://www.intracen.org/)"
       )
     with col_b:
       st.markdown(
-          '🔐 [Open Secure MyITC Login'
-          ' Portal](https://myitc.intracen.org/)'
+          "🔐 [Open Secure MyITC Login"
+          " Portal](https://myitc.intracen.org/)"
       )
 
-    if st.button('Query ITC Intelligence Feed', type='primary'):
-      with st.spinner('Connecting to intracen.org...'):
+    if st.button("Query ITC Intelligence Feed", type="primary"):
+      with st.spinner("Connecting to intracen.org..."):
         itc_res = itc_prov.fetch_itc_intelligence()
-      if itc_res['status'] == 'VERIFIED':
-        st.success('ITC Platform summary retrieved!')
-        for ins in itc_res['insights'][:5]:
-          st.markdown(f'* {ins}')
+      if itc_res["status"] == "VERIFIED":
+        st.success("ITC Platform summary retrieved!")
+        for ins in itc_res["insights"][:5]:
+          st.markdown(f"* {ins}")
       else:
         st.info(
-            'Live feed protected by institutional firewall. Use direct portal'
-            ' links above for secure browsing.'
+            "Live feed protected by institutional firewall. Use direct portal"
+            " links above for secure browsing."
         )
 
-elif nav_selection == 'Maritime & Vessel Traffic Intelligence':
-  st.title('Maritime Logistics & Vessel Traffic Intelligence')
+elif nav_selection == "Maritime & Vessel Traffic Intelligence":
+  st.title("Maritime Logistics & Vessel Traffic Intelligence")
   st.markdown(
-      'Real-time tracking of cargo vessels, shipping lanes, and port congestion'
-      ' relevant to international trade corridors in BARMM and the wider'
-      ' Philippines.'
+      "Real-time tracking of cargo vessels, shipping lanes, and port congestion"
+      " relevant to international trade corridors in BARMM and the wider"
+      " Philippines."
   )
-  st.markdown('---')
+  st.markdown("---")
 
-  if st.button('🚢 Scan Live Maritime Traffic (Data Docked)', type='primary'):
+  if st.button("🚢 Scan Live Maritime Traffic (Data Docked)", type="primary"):
     with st.spinner(
-        'Fetching live vessel positions and port tracking from Data Docked...'
+        "Fetching live vessel positions and port tracking from Data Docked..."
     ):
       maritime_res = datadocked.fetch_vessel_traffic()
 
-    if maritime_res['status'] == 'VERIFIED':
-      st.success('Maritime intelligence feed synchronized successfully!')
-      vessel_df = pd.DataFrame(maritime_res['data'])
+    if maritime_res["status"] == "VERIFIED":
+      st.success("Maritime intelligence feed synchronized successfully!")
+      vessel_df = pd.DataFrame(maritime_res["data"])
       st.dataframe(vessel_df, use_container_width=True, hide_index=True)
     else:
       st.error(
-          'Failed to retrieve live maritime streams. Please check API quota or'
-          ' documentation.'
+          "Failed to retrieve live maritime streams. Please check API quota or"
+          " documentation."
       )
 
   st.markdown(
@@ -566,67 +656,67 @@ elif nav_selection == 'Maritime & Vessel Traffic Intelligence':
       unsafe_allow_html=True,
   )
 
-elif nav_selection == 'n8n Workflow & Automation Trigger':
-  st.title('⚡ n8n Trade Automation & Workflow Engine')
+elif nav_selection == "n8n Workflow & Automation Trigger":
+  st.title("⚡ n8n Trade Automation & Workflow Engine")
   st.markdown(
-      'Trigger automated background processes, data syncs, and alert'
-      ' dispatches via your connected n8n server workflow.'
+      "Trigger automated background processes, data syncs, and alert"
+      " dispatches via your connected n8n server workflow."
   )
-  st.markdown('---')
+  st.markdown("---")
 
   with st.container():
     st.markdown('<div class="card-container">', unsafe_allow_html=True)
-    st.subheader('Dispatch Trade Report to n8n Webhook Endpoint')
+    st.subheader("Dispatch Trade Report to n8n Webhook Endpoint")
 
     workflow_action = st.selectbox(
-        'Select Workflow Task:',
+        "Select Workflow Task:",
         [
-            'Sync Bilateral Tariff & Comtrade Batch',
-            'Generate Executive Summary Brief',
-            'Dispatch Maritime Alert Notification',
+            "Sync Bilateral Tariff & Comtrade Batch",
+            "Generate Executive Summary Brief",
+            "Dispatch Maritime Alert Notification",
         ],
     )
     official_email = st.text_input(
-        'Official Recipient Email:', 'policy-official@barmm.gov.ph'
+        "Official Recipient Email:", "policy-official@barmm.gov.ph"
     )
 
     trigger_n8n = st.button(
-        '🚀 Trigger n8n Webhook Flow', type='primary', use_container_width=True
+        "🚀 Trigger n8n Webhook Flow", type="primary", use_container_width=True
     )
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
   if trigger_n8n:
-    with st.spinner('Communicating with n8n workflow server...'):
+    with st.spinner("Communicating with n8n workflow server..."):
       n8n_url = (
-          'https://airsad.app.n8n.cloud/webhook-test/3ccc072a-14fb-4b10-8a18-8b6d27ab8c3e'
+          "https://airsad.app.n8n.cloud/webhook-test/3ccc072a-14fb-4b10-8a18-8b6d27ab8c3e"
       )
       payload = {
-          'action': workflow_action,
-          'recipient': official_email,
-          'terminal': 'PH Trade Intelligence Terminal v4.5',
+          "action": workflow_action,
+          "recipient": official_email,
+          "terminal": "PH Trade Intelligence Terminal v4.5",
       }
       try:
         resp = requests.post(n8n_url, json=payload, timeout=10)
         if resp.status_code == 200:
           st.success(
-              '✅ n8n workflow successfully triggered and executed!'
+              "✅ n8n workflow successfully triggered and executed!"
           )
         else:
           st.warning(
-              '⚠️ n8n responded with status code: ' + str(resp.status_code)
+              "⚠️ n8n responded with status code: " + str(resp.status_code)
           )
       except Exception as err:
         st.error(
-            f'❌ Could not connect to n8n webhook endpoint. Details: {err}'
+            f"❌ Could not connect to n8n webhook endpoint. Details: {err}"
         )
 
-elif nav_selection == 'Data Sources & Provenance':
-  st.title('Data Sources & Institutional Provenance')
+elif nav_selection == "Data Sources & Provenance":
+  st.title("Data Sources & Institutional Provenance")
   st.markdown(
-      'Transparent documentation of all integrated trade databases and'
-      ' official government APIs.'
+      "Transparent documentation of all integrated trade databases and"
+      " official government APIs."
   )
-  st.markdown('---')
+  st.markdown("---")
 
   st.markdown(
       """
