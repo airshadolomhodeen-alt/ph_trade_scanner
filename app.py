@@ -108,9 +108,7 @@ nav_selection = st.sidebar.radio(
 
 st.sidebar.markdown('---')
 st.sidebar.subheader('🔌 Live Institutional Gateways')
-st.sidebar.markdown(
-    '🟢 **PSA Classification API**: Active'
-)  # <-- Added your official token status
+st.sidebar.markdown('🟢 **PSA Classification API**: Active')
 st.sidebar.markdown('🟢 **UN Comtrade API**: Active')
 st.sidebar.markdown('🟢 **World Bank WITS**: Active')
 st.sidebar.markdown('🟢 **PEZA Official Portal**: Active')
@@ -284,11 +282,22 @@ elif nav_selection == 'PSA Official Classification API Gateway':
     with st.spinner(
         'Communicating with PSA Classification API endpoint securely...'
     ):
-      psa_result = psa_prov.query_classification(psa_query)
+      psa_result = psa_prov.query_classification(query_params={"q": psa_query})
 
-    if psa_result['status'] == 'VERIFIED':
-      st.success('✅ PSA Classification query executed successfully!')
-      st.json(psa_result['data'])
+    if psa_result.get('status') in ['VERIFIED', 'VERIFIED_OFFLINE_CACHE']:
+      st.success(
+          f"✅ PSA Classification query executed successfully! Status:"
+          f" [{psa_result.get('status')}]"
+      )
+
+      data_payload = psa_result.get('data', [])
+      if isinstance(data_payload, list) and data_payload:
+        df_psa = pd.DataFrame(data_payload)
+        st.dataframe(df_psa, use_container_width=True)
+      elif isinstance(data_payload, dict):
+        st.json(data_payload)
+      else:
+        st.info("No structured dataset array returned in payload.")
     else:
       st.info(
           'ℹ️ Connected to PSA Gateway endpoint using token. Response details:'
@@ -588,7 +597,6 @@ elif nav_selection == 'n8n Workflow & Automation Trigger':
 
   if trigger_n8n:
     with st.spinner('Communicating with n8n workflow server...'):
-      # Replace with your production or test URL from your n8n Webhook node
       n8n_url = (
           'https://airsad.app.n8n.cloud/webhook-test/3ccc072a-14fb-4b10-8a18-8b6d27ab8c3e'
       )
